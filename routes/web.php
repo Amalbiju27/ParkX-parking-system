@@ -91,7 +91,18 @@ Route::middleware(['auth', 'role:owner'])->prefix('owner')->name('owner.')->grou
     // Vehicle Exit
     Route::get('/vehicle-exit', [VehicleExitController::class, 'index'])->name('vehicle.exit');
     Route::post('/vehicle-exit/{id}/{type}', [VehicleExitController::class, 'processExit'])->name('vehicle.exit.process');
+    
+    // Check-In Booking via Camera Scanner & Manual Button
+    Route::post('/booking/check-in/{id}', [OwnerDashboardController::class, 'checkIn'])->name('booking.check-in');
+    Route::post('/booking/manual-check-in/{id}', [OwnerDashboardController::class, 'manualCheckIn'])->name('booking.manual-check-in');
 });
+
+/*
+|--------------------------------------------------------------------------
+| Public Ticket Route (For scanning)
+|--------------------------------------------------------------------------
+*/
+Route::get('/ticket/{id}', [BookingController::class, 'showMobileTicket'])->name('ticket.show');
 
 /*
 |--------------------------------------------------------------------------
@@ -109,6 +120,8 @@ Route::middleware(['auth', 'role:user'])->prefix('user')->name('user.')->group(f
     Route::post('/booking/{id}/pay', [BookingController::class, 'processPayment'])->name('booking.pay.process');
     Route::get('/booking/{id}/ticket', [BookingController::class, 'ticket'])->name('booking.ticket');
     Route::put('/booking/{id}/cancel', [BookingController::class, 'cancel'])->name('booking.cancel');
-    Route::get('/booking/{id}/extend', [BookingController::class, 'extendForm'])->name('booking.extend');
-    Route::post('/booking/{id}/extend', [BookingController::class, 'extend'])->name('booking.extend.process');
+    Route::post('/booking/{id}/grace-period', [BookingController::class, 'applyLateGracePeriod'])->name('booking.grace-period');
+    Route::post('/booking/{id}/extend-duration', [BookingController::class, 'extendDuration'])->name('booking.extend-duration');
+    Route::get('/extension/checkout', [BookingController::class, 'extensionCheckout'])->name('extension.checkout');
+    Route::post('/extension/process-payment', [BookingController::class, 'processExtensionPayment'])->name('extension.process-payment');
 });

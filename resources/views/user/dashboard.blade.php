@@ -134,17 +134,19 @@
                                         <span class="inline-block px-3 py-1 rounded-full text-xs font-bold border tracking-widest {{ $b->status == 'cancelled' ? 'border-red-200 text-red-700 bg-red-50' : 'border-green-200 text-green-700 bg-green-50' }} mb-2 uppercase">
                                             {{ $b->status }}
                                         </span>
-                                        <div class="font-mono text-xs tracking-widest {{ $isExpired ? 'text-red-600 font-black' : 'text-gray-600 font-bold' }}">
-                                            {{ $diffStr }}
-                                        </div>
+                                        @if(is_null($b->scanned_at))
+                                            <div class="font-mono text-xs tracking-widest {{ $isExpired ? 'text-red-600 font-black' : 'text-gray-600 font-bold' }}">
+                                                {{ $diffStr }}
+                                            </div>
+                                        @endif
                                     </td>
                                     <td class="py-6 px-6">
                                         <div class="font-mono text-xl font-black text-black">₹{{ number_format($b->amount, 0) }}</div>
                                     </td>
                                     <td class="py-6 px-6">
-                                        @if($b->payment_status === 'pending')
+                                        @if($b->payment_status === 'pending' && is_null($b->scanned_at))
                                             <a href="/user/booking/{{ $b->id }}/pay" class="inline-block px-6 py-2 bg-black hover:bg-gray-800 text-white font-bold text-xs tracking-widest uppercase transition-colors">PAY NOW</a>
-                                        @else
+                                        @elseif($b->payment_status === 'paid')
                                             <span class="inline-flex items-center gap-2 text-green-700 font-bold text-xs tracking-widest uppercase">
                                                 <i class="fas fa-check-circle"></i> PAID
                                             </span>
@@ -156,12 +158,29 @@
                                                 <a target="_blank" href="https://www.google.com/maps/search/?api=1&query={{ urlencode($b->location) }}" class="px-4 py-2 border border-black text-black hover:bg-black hover:text-white font-bold text-xs uppercase tracking-widest transition-all">MAP</a>
                                             @endif
                                             <a href="/user/booking/{{ $b->id }}/ticket" class="px-4 py-2 border border-gray-300 text-black hover:bg-gray-100 font-bold text-xs uppercase tracking-widest transition-all">QR</a>
-                                            <a href="/user/booking/{{ $b->id }}/extend" class="px-4 py-2 border border-gray-300 text-black hover:bg-gray-100 font-bold text-xs uppercase tracking-widest transition-all">EXTEND</a>
-                                            <form action="{{ route('user.booking.cancel', $b->id) }}" method="POST" class="inline-block m-0">
-                                                @csrf
-                                                @method('PUT')
-                                                <button type="submit" class="px-4 py-2 border border-red-200 text-red-600 bg-red-50 hover:bg-red-600 hover:text-white font-bold text-xs uppercase tracking-widest transition-all cursor-pointer">CANCEL</button>
-                                            </form>
+                                            @if(!$b->scanned_at)
+                                                <form action="{{ route('user.booking.grace-period', $b->id) }}" method="POST" class="inline-block m-0">
+                                                    @csrf
+                                                    <button type="submit" class="px-4 py-2 border border-orange-300 text-orange-600 bg-orange-50 hover:bg-orange-600 hover:text-white font-bold text-xs uppercase tracking-widest transition-all cursor-pointer">RUNNING LATE? (+10 MINS)</button>
+                                                </form>
+                                            @else
+                                                <form action="{{ route('user.booking.extend-duration', $b->id) }}" method="POST" class="inline-flex items-center m-0 gap-2">
+                                                    @csrf
+                                                    <select name="extra_hours" class="h-full px-2 py-2 border border-gray-300 text-xs font-bold font-mono outline-none">
+                                                        <option value="1">+1 HR</option>
+                                                        <option value="2">+2 HRS</option>
+                                                        <option value="3">+3 HRS</option>
+                                                    </select>
+                                                    <button type="submit" class="px-4 py-2 border border-blue-300 text-blue-600 bg-blue-50 hover:bg-blue-600 hover:text-white font-bold text-xs uppercase tracking-widest transition-all cursor-pointer">EXTEND</button>
+                                                </form>
+                                            @endif
+                                            @if(is_null($b->scanned_at))
+                                                <form action="{{ route('user.booking.cancel', $b->id) }}" method="POST" class="inline-block m-0">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <button type="submit" class="px-4 py-2 border border-red-200 text-red-600 bg-red-50 hover:bg-red-600 hover:text-white font-bold text-xs uppercase tracking-widest transition-all cursor-pointer">CANCEL</button>
+                                                </form>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>

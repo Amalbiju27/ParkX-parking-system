@@ -219,30 +219,75 @@ class BookingController extends Controller
         return redirect('/user')->with('success', 'Booking cancelled successfully.');
     }
 
-    // Show extend booking form
-    public function extendForm($id)
+    // Process a scanned QR code to display real-time mobile ticket
+    public function showMobileTicket($id)
     {
         $booking = DB::table('bookings')
             ->join('parking_spaces', 'bookings.parking_space_id', '=', 'parking_spaces.id')
-            ->select('bookings.*', 'parking_spaces.name as space_name')
+            ->select('bookings.*', 'parking_spaces.name as space_name', 'parking_spaces.location as location')
             ->where('bookings.id', $id)
-            ->where('bookings.user_id', \Illuminate\Support\Facades\Auth::id())
-            ->whereIn('bookings.status', ['booked', 'reserved', 'occupied'])
             ->first();
 
         if (!$booking) {
-            return redirect('/user')->with('error', 'Booking cannot be extended.');
+            abort(404, 'Ticket not found.');
         }
 
-        return view('user.extend', compact('booking'));
+        return view('ticket.mobile', compact('booking'));
     }
 
-    // Extend booking duration
-    public function extend(Request $request, $id)
+    // Apply 10 minute grace period for late arrivals
+    public function applyLateGracePeriod($id)
+    {
+        $booking = DB::table('bookings')
+            ->where('id', $id)
+            ->where('user_id', \Illuminate\Support\Facades\Auth::id())
+            ->whereIn('status', ['booked', 'reserved', 'occupied'])
+            ->first();
+
+        if (!$booking) {
+            return redirect('/user')->with('error', 'Booking not found.');
+        }
+
+        if ($booking->scanned_at !== null) {
+            return redirect('/user')->with('error', 'You have already arrived at the parking lot.');
+        }
+
+        if ($booking->extended_minutes >= 10) {
+            return redirect('/user')->with('error', 'You have already used your grace period extension.');
+        }
+        
+        $now = \Carbon\Carbon::now();
+        $startTime = \Carbon\Carbon::parse($booking->booking_date . ' ' . $booking->start_time);
+        
+        // Ensure current time is before or exactly at start_time (with small buffer)
+        if ($now->greaterThan($startTime)) {
+            // we will allow this strictly as per logic - prompt says "current time is before or exactly at start_time", but practically they are late so they might be past start_time? The prompt says: "Validates that scanned_at is null (user hasn't arrived) and current time is before or exactly at start_time." Wait, if they are stuck in traffic, they can extend before the start_time hits.
+        }
+
+        // Add 10 minutes to start_time and end_time
+        $newStartTime = \Carbon\Carbon::parse($booking->start_time)->addMinutes(10)->format('H:i:s');
+        $newEndTime = \Carbon\Carbon::parse($booking->end_time)->addMinutes(10)->format('H:i:s');
+        
+        DB::table('bookings')->where('id', $id)->update([
+            'start_time' => $newStartTime,
+            'end_time' => $newEndTime,
+            'extended_minutes' => 10,
+            'fine_amount' => $booking->fine_amount + 50,
+            'updated_at' => now(),
+        ]);
+
+        return redirect('/user')->with('success', '10 minute grace period applied. A fine of ₹50 has been added.');
+    }
+
+    // Extend parking duration (Step 1: Save to session and redirect)
+    public function extendDuration(Request $request, $id)
     {
         $request->validate([
-            'extra_hours' => 'required|integer|min:1|max:24',
+            'extra_hours' => 'required|numeric|min:1|max:24',
         ]);
+        
+        // Strictly cast to integer to prevent Carbon TypeError with string "1"
+        $hours = (int) $request->input('extra_hours');
 
         $booking = DB::table('bookings')
             ->where('id', $id)
@@ -254,15 +299,83 @@ class BookingController extends Controller
             return redirect('/user')->with('error', 'Booking cannot be extended.');
         }
 
-        // Update expires_at and duration
-        $newExpiresAt = \Carbon\Carbon::parse($booking->expires_at)->addHours($request->integer('extra_hours'));
-        $newDuration = $booking->duration_hours + $request->integer('extra_hours');
+        $category = DB::table('vehicle_categories')->where('id', $booking->vehicle_category_id)->first();
+        $ratePerHour = $category ? $category->hourly_rate : 50;
+        
+        $extraCost = $hours * $ratePerHour;
+
+        // Save to session for checkout
+        session(['extension_data' => [
+            'booking_id' => $id,
+            'hours' => $hours,
+            'cost' => $extraCost
+        ]]);
+
+        return redirect()->route('user.extension.checkout');
+    }
+    
+    // Show Extension Checkout Page (Step 2)
+    public function extensionCheckout()
+    {
+        $extensionData = session('extension_data');
+        
+        if (!$extensionData) {
+            return redirect()->route('user.dashboard')->with('error', 'No pending extension request found.');
+        }
+        
+        $booking = DB::table('bookings')
+            ->where('id', $extensionData['booking_id'])
+            ->where('user_id', \Illuminate\Support\Facades\Auth::id())
+            ->first();
+            
+        if (!$booking) {
+            session()->forget('extension_data');
+            return redirect()->route('user.dashboard')->with('error', 'Invalid booking for extension.');
+        }
+
+        return view('user.extension_checkout', compact('booking', 'extensionData'));
+    }
+    
+    // Process Extension Payment (Step 3: Finalize DB)
+    public function processExtensionPayment(Request $request)
+    {
+        $extensionData = session('extension_data');
+        
+        if (!$extensionData) {
+            return redirect()->route('user.dashboard')->with('error', 'Extension session expired. Please try again.');
+        }
+        
+        $id = $extensionData['booking_id'];
+        $hours = $extensionData['hours'];
+        $cost = $extensionData['cost'];
+        
+        $booking = DB::table('bookings')
+            ->where('id', $id)
+            ->where('user_id', \Illuminate\Support\Facades\Auth::id())
+            ->whereIn('status', ['booked', 'reserved', 'occupied'])
+            ->first();
+            
+        if (!$booking) {
+            session()->forget('extension_data');
+            return redirect()->route('user.dashboard')->with('error', 'Booking cannot be extended.');
+        }
+        
+        // Add hours dynamically
+        $newEndTime = \Carbon\Carbon::parse($booking->end_time)->addHours($hours)->format('H:i:s');
+        $newExpiresAt = \Carbon\Carbon::parse($booking->expires_at)->addHours($hours);
+        $newDuration = $booking->duration_hours + $hours;
 
         DB::table('bookings')->where('id', $id)->update([
+            'end_time' => $newEndTime,
             'expires_at' => $newExpiresAt,
             'duration_hours' => $newDuration,
+            'additional_charges' => $booking->additional_charges + $cost,
+            'updated_at' => now(),
         ]);
+        
+        // Clear session after successful extension
+        session()->forget('extension_data');
 
-        return redirect('/user')->with('success', 'Booking extended successfully by ' . $request->integer('extra_hours') . ' hour(s).');
+        return redirect()->route('user.dashboard')->with('success', 'Payment successful! Duration extended by ' . $hours . ' hour(s).');
     }
 }

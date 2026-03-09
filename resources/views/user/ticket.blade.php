@@ -24,7 +24,7 @@
             
             <div class="flex justify-center mb-8 p-4 bg-gray-50 border border-t-0 border-x-0 border-b-2 border-black border-dashed pb-8">
                 <!-- simple-qrcode blade syntax -->
-                {!! QrCode::size(220)->color(0, 0, 0)->margin(0)->generate($booking->id . '-' . $booking->space_name) !!}
+                {!! QrCode::size(220)->color(0, 0, 0)->margin(0)->generate(route('ticket.show', $booking->id)) !!}
             </div>
 
             <div class="bg-gray-50 p-6 border border-gray-200 mb-8">
