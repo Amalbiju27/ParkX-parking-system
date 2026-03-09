@@ -4,7 +4,7 @@
 
   ![Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
   ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
-  ![Bootstrap](https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white)
+  ![Tailwind CSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)
   ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
   
   <br />
@@ -20,7 +20,6 @@
 - [Technology Stack](#-technology-stack)
 - [Screenshots](#-screenshots)
 - [Getting Started](#-getting-started)
-- [System Architecture](#-system-architecture)
 
 ---
 
@@ -41,17 +40,18 @@
 | --- | --- |
 | **Backend** | Laravel 12 (PHP 8.2) |
 | **Database** | PostgreSQL |
-| **Frontend** | Blade Templates, HTML5, CSS3, JavaScript (ES6), Bootstrap 5 |
+| **Frontend** | Blade Templates, HTML5, Tailwind CSS, JavaScript (ES6) |
 | **Integration** | Simple-QRCode (Generator), HTML5-QRCode (Webcam Scanner) |
 | **Version Control**| Git, GitHub |
 
 ---
 
 ## 📸 Screenshots
-*(Add your project screenshots here by dragging and dropping images from your `SCREENSHOTS` folder directly into the GitHub web editor)*
 
-- **User Dashboard & QR Ticket:**
+*(Add your project screenshots here by dragging and dropping images from your local computer directly into the GitHub web editor while editing this file)*
+
 - **Owner Live Matrix:**
+- **User Dashboard & QR Ticket:**
 - **Mock Payment Gateway:**
 
 ---
@@ -63,6 +63,7 @@ Ensure you have the following installed on your local machine:
 * PHP >= 8.2
 * Composer
 * PostgreSQL
+* Node.js & NPM (For Tailwind CSS compilation)
 * Git
 
 ### Local Installation
