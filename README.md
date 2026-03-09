@@ -19,44 +19,52 @@
 
 ## Table of Contents
 
-- [Core Features](#core-features)
-- [Technology Stack](#technology-stack)
-- [Screenshots](#screenshots)
-- [Getting Started](#getting-started)
+* [Core Features](#core-features)
+* [Technology Stack](#technology-stack)
+* [Screenshots](#screenshots)
+* [Getting Started](#getting-started)
 
 <hr />
 
 ## Core Features
 
 ### Real-Time Parking Matrix
-A responsive live grid that mirrors the actual parking layout on the Owner Dashboard. Parking slots automatically update their status (Available / Occupied) when a QR ticket is scanned.
+
+A responsive live grid that mirrors the actual parking layout on the Owner Dashboard.
+Parking slots automatically update their status (Available / Occupied) when a QR ticket is scanned.
 
 ### Concurrency Control
+
 Utilizes database transactions (`DB::transaction`) during the booking phase to eliminate race conditions and prevent double booking.
 
 ### Live QR Ticket Scanning
+
 Features an integrated webcam scanner using `html5-qrcode`, allowing operators to instantly verify and check-in vehicles upon arrival.
 
 ### Security Validation
+
 Mandates vehicle condition video uploads during booking, utilizing both client-side interception and server-side MIME validation.
 
 ### Dynamic Time Extensions
-Users can extend parking duration through a secure mock checkout system. A 10-minute grace period is provided prior to the application of late fines.
+
+Users can extend parking duration through a secure mock checkout system.
+A 10-minute grace period is provided prior to the application of late fines.
 
 ### Automated Slot Expiry
+
 Implements Laravel Task Scheduling to automatically free up slots if payment is not completed within 15 minutes of booking initiation.
 
 <hr />
 
 ## Technology Stack
 
-| Category | Technologies |
-| :--- | :--- |
-| **Backend** | Laravel 12 (PHP 8.2) |
-| **Database** | PostgreSQL |
-| **Frontend** | Blade Templates, HTML5, Tailwind CSS, JavaScript (ES6) |
-| **Integration** | Simple-QRCode (Generator), HTML5-QRCode (Scanner) |
-| **Version Control** | Git, GitHub |
+| Category            | Technologies                                           |
+| :------------------ | :----------------------------------------------------- |
+| **Backend**         | Laravel 12 (PHP 8.2)                                   |
+| **Database**        | PostgreSQL                                             |
+| **Frontend**        | Blade Templates, HTML5, Tailwind CSS, JavaScript (ES6) |
+| **Integration**     | Simple-QRCode (Generator), HTML5-QRCode (Scanner)      |
+| **Version Control** | Git, GitHub                                            |
 
 <hr />
 
@@ -65,16 +73,19 @@ Implements Laravel Task Scheduling to automatically free up slots if payment is 
 *(Ensure your images are uploaded to the `screenshots` directory in your repository root)*
 
 ### Owner Parking Matrix
+
 <p align="center">
   <img src="screenshots/owner-dashboard.png" width="850" alt="Owner Dashboard Live Matrix">
 </p>
 
 ### User Dashboard & QR Ticket
+
 <p align="center">
   <img src="screenshots/qr-ticket.png" width="850" alt="User Dashboard and Mobile QR Ticket">
 </p>
 
 ### Mock Payment Gateway
+
 <p align="center">
   <img src="screenshots/payment.png" width="850" alt="Secure Mock Payment Gateway">
 </p>
@@ -84,50 +95,78 @@ Implements Laravel Task Scheduling to automatically free up slots if payment is 
 ## Getting Started
 
 ### Prerequisites
+
 Ensure the following tools are installed on your local environment:
-- PHP >= 8.2
-- Composer
-- PostgreSQL
-- Node.js & NPM
-- Git
+
+* PHP >= 8.2
+* Composer
+* PostgreSQL
+* Node.js & NPM
+* Git
+
+---
 
 ### Local Installation
 
-**1. Clone the repository**
+#### 1. Clone the repository
 
-git clone [https://github.com/Amalbiju27/ParkX.git](https://github.com/Amalbiju27/ParkX.git)
+```
+git clone https://github.com/Amalbiju27/ParkX.git
 cd ParkX
-2. Install dependencies
+```
 
-Bash
+#### 2. Install dependencies
+
+```
 composer install
 npm install
 npm run build
-3. Configure environment
+```
 
-Bash
+#### 3. Configure environment
+
+```
 cp .env.example .env
 php artisan key:generate
-Open .env and configure your PostgreSQL database credentials and set APP_TIMEZONE=Asia/Kolkata.
+```
 
-4. Run database migrations
+Open `.env` and configure your PostgreSQL database credentials.
+Also set:
 
-Bash
+```
+APP_TIMEZONE=Asia/Kolkata
+```
+
+#### 4. Run database migrations
+
+```
 php artisan migrate --seed
-5. Link storage (for file uploads)
+```
 
-Bash
+#### 5. Link storage (for file uploads)
+
+```
 php artisan storage:link
-6. Start the development server
+```
 
-Bash
+#### 6. Start the development server
+
+```
 php artisan serve
-Access the application at http://127.0.0.1:8000.
+```
 
-7. Run the background scheduler
+Access the application at:
 
-Bash
+```
+http://127.0.0.1:8000
+```
+
+#### 7. Run the background scheduler
+
+```
 php artisan schedule:work
+```
+
 <hr />
 
 <div align="center">
