@@ -1,0 +1,134 @@
+\chapter{SYSTEM ANALYSIS }
+
+\section{Module Description}
+The "ParkX" application is divided into multiple functional modules, each playing a key role in ensuring a smooth parking management experience. The main modules include:
+
+\begin{itemize}
+    \item \textbf{User Module:} This module is designed for drivers who need to book a parking slot. It allows users to register, log in securely, view available parking lots and precise slots via an architectural grid, select their vehicle type, and book slots for specific time frames. Users can also view their booking history entirely from their personalized dashboard.
+    \item \textbf{Owner Module:} Designed for parking space administrators. Owners can register and log in to manage their parking assets. Once approved by the Super Admin, they can dynamically add, edit, or delete individual parking slots, categorize them by vehicle type, and monitor incoming booking reservations in real time from a dedicated dashboard.
+    \item \textbf{Admin Module:} The central governance module of the application. The Super Admin monitors platform analytics (Total Users, Total Earnings, Total Owners) and manages the overarching taxonomy of the system. This includes defining universal Vehicle Categories that apply to all owner slots and approving new owners onto the platform.
+\end{itemize}
+
+\section{Business Rules}
+Business rules govern the operations and logic of ParkX to ensure consistency, security, and proper resource utilization.
+
+\textbf{Authentication and Roles}
+\begin{itemize}
+    \item Users must be authenticated to interact with any core system features.
+    \item Role-Based Access Control (RBAC) securely redirects traffic: Users cannot access the Owner dashboard, and Owners cannot access Admin settings.
+\end{itemize}
+
+\textbf{Booking and Slots Setup}
+\begin{itemize}
+    \item A single slot cannot be double-booked during overlapping time windows. Backend validations securely reject overlapping reservation attempts.
+    \item A slot must belong to a predefined Vehicle Category.
+    \item Users must specify their vehicle category before being presented with available slots, ensuring a two-wheeler does not book a four-wheeler space.
+\end{itemize}
+
+\section{Use Case Model}
+The Use Case Model identifies the core interactions between actors (User, Owner, Admin) and the systemic endpoints they trigger.
+
+\subsection{Use Case Descriptions}
+The following table outlines the foundational system events inside the smart parking management framework:
+\begin{longtable}{|p{2cm}|p{4cm}|p{8cm}|}
+    \hline
+    \textbf{ID} & \textbf{Use Case} & \textbf{Description} \\
+    \hline
+    \endhead
+    UC01 & Register / Login & User/Owner authenticates with system securely. \\
+    \hline
+    UC02 & Manage Properties & Owner creates, updates, and reviews physical spaces. \\
+    \hline
+    UC03 & Book Slot & User reserves an open slot based on vehicle category. \\
+    \hline
+    UC04 & Require Video & User uploads a 10MB condition video for proof. \\
+    \hline
+    UC05 & System Analytics & Super Admin views global utilization rates and manages taxonomy. \\
+    \hline
+\end{longtable}
+
+\subsection{Use Case Diagram}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{use_case.png}
+    \caption{Use Case Diagram: ParkX Role Workflows}
+\end{figure}
+As depicted, the Admin possesses global managerial rights over categories and roles. The Owner acts as a supplier, managing slots and tracking bookings. The User operates as the consumer, directly reserving available slots.
+
+\section{Analysis of Architecture}
+\subsection{Key Algorithms}
+The backend relies strongly upon ACID-compliant transaction locking via PostgreSQL. During a booking reservation, a native Database Transaction sequence is launched. The \texttt{SELECT FOR UPDATE} query ensures that even if two users attempt to book the exact same slot for the identical timeframe concurrently, exactly one will block dynamically until the query resolves.
+
+{\large \textbf{Laravel PHP Framework}}\\\\
+Laravel is an elegant PHP web framework used as the backbone of ParkX. It handles secure user authentication, robust database schema migrations, complex Eloquent ORM relationships, and role-based middleware logic.
+
+\begin{enumerate}
+    \item \textbf{MVC Architecture:}
+    \begin{itemize}
+        \item Separates concerns dynamically: Models represent database entities (User, Slot, Booking), Controllers handle business logic (DashboardController, BookingController), and Views dictate the frontend rendering via Blade templates.
+    \end{itemize}
+    \item \textbf{Bootstrap 5 and Chart.js:}
+    \begin{itemize}
+        \item Bootstrap 5 provides a robust grid system and pre-styled components to build a responsive, professional UI without excessive custom CSS.
+        \item Chart.js offers interactive, data-driven visual representations natively in the browser, enabling dynamic analytics dashboards for Owners and Admins.
+    \end{itemize}
+\end{enumerate}
+
+\section{Feasibility Analysis}
+
+\subsection{Technical Feasibility}
+Technical feasibility assesses whether the project can be completed with existing technology stacks.
+The choice of Laravel, PostgreSQL, and Bootstrap 5 provides a seamless, powerful stack that is highly feasible. The ParkX system utilizes native Eloquent ORM relationships to connect Users to Bookings and Owners to Slots, removing the need for raw SQL queries. Specifically, PostgreSQL is deployed for its robust ACID compliance, explicit row-level locking (\texttt{FOR UPDATE}), and stringent transaction safety—critical features necessary for exact-time scheduling without double-booking collisions. Security measures like cross-site scripting (XSS) and cross-site request forgery (CSRF) are inherently managed by Laravel.
+
+\subsection{Economical Feasibility}
+Economic feasibility refers to the cost-effectiveness of a project.
+ParkX minimizes overheads by relying upon free and open-source software (FOSS). The XAMPP server stack alongside Composer and Node Package Manager (NPM) allows entirely cost-free local development. The database does not require licensing fees, making it an economically viable deployment for both the developer and future clients.
+
+\subsection{Operational Feasibility}
+Operational feasibility evaluates how the system integrates into existing operational workflows.
+ParkX significantly improves over manual ticketing systems. It reduces lines, allows centralized tracking for owners, and simplifies discovering spaces for users. The UI features clear indicators, such as color-coded mapping for available slots, making it intuitive for operators with minimal technical training.
+
+\section{System Environment}
+
+\subsection{Software Environment}
+\textbf{XAMPP/Local Environment:} Provides the Apache web server and PHP runtime needed to host the application locally.\\\\
+\textbf{Laravel 12 (PHP 8.2+):} The core MVC application framework.\\\\
+\textbf{PostgreSQL Engine:} The primary relational database used for strict transactional integrity and concurrency control.\\\\
+\textbf{Bootstrap 5 \& Chart.js:} Integrated to provide responsive frontend components and dynamic administrative charts.
+
+\subsection{Hardware Environment}
+\textbf{Processor (CPU):} i3 8th Gen or equivalent (Minimum)\\\\
+\textbf{Memory (RAM):} 4 GB for development execution\\\\
+\textbf{Storage:} 1 GB SSD space for vendor/node\_modules dependency compilation\\\\
+\textbf{Operating System:} Windows 11 / Linux (Ubuntu)
+
+\section{Actors and Roles}
+The system involves three primary actors: 
+
+\noindent
+\textbf{Actor Name: User}\\
+\textbf{Role:}
+\begin{itemize}
+    \item Browse slots, book slots based on vehicle categories, and view previous reservation history.
+\end{itemize}
+\noindent
+\textbf{Actor Name: Property Owner}\\
+\textbf{Role:}
+\begin{itemize}
+    \item Manage parking plots, categorize slots, and organize physical venues.
+\end{itemize}
+\noindent
+\textbf{Actor Name: Super Admin}\\
+\textbf{Role:}
+\begin{itemize}
+    \item Perform administrative governance, govern roles, and enforce system vehicle taxonomies (categories).
+\end{itemize}
+
+\section{Activity Diagram}
+The Activity diagram highlights the step-by-step logical sequence inside the ParkX system when a User attempts to generate a new booking.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{activity_booking.png}
+    \caption{Activity Diagram - Booking Flow}
+\end{figure}
+The User logs in and transitions directly to the venue and slot selection menus. They must provide booking details, after which the system performs a rigid validation check to prevent slot overlaps. If available, the transaction concludes successfully.

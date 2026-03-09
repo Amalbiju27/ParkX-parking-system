@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'default' });
+  </script>
+</head>
+
+<body style="background: white; margin: 20px;">
+
+  <div id="usecase" class="mermaid">
+    flowchart LR
+    %% Actors
+    User((User))
+    Owner((Owner))
+    Admin((Super Admin))
+
+    %% Use Cases
+    subgraph ParkX System
+    U1([Book Exact-Time Slots])
+    U2([Upload Condition Video])
+    O1([Manage Physical Parking Spaces])
+    O2([Manage Parking Slots])
+    A1([Manage Vehicle Categories])
+    A2([View System Analytics])
+    end
+
+    %% Relationships
+    User --> U1
+    User --> U2
+    Owner --> O1
+    Owner --> O2
+    Admin --> A1
+    Admin --> A2
+  </div>
+
+  <div id="activity_booking" class="mermaid" style="margin-top: 100px;">
+    stateDiagram-v2
+    [*] --> UserLogin
+    UserLogin --> SelectVenue
+    SelectVenue --> ChooseTime
+    ChooseTime --> CheckDBConflict
+    state CheckDBConflict <<choice>>
+      CheckDBConflict --> ChooseTime : Slot Taken
+      CheckDBConflict --> Upload10MBVideo : Slot Available
+      Upload10MBVideo --> ProcessPayment
+      ProcessPayment --> GenerateQRTicket
+      GenerateQRTicket --> [*]
+  </div>
+
+  <div id="er_diagram" class="mermaid" style="margin-top: 100px;">
+    erDiagram
+    users ||--o{ parking_spaces : "owns (1:N)"
+    users ||--o{ bookings : "makes (1:N)"
+    parking_spaces ||--o{ parking_slots : "contains (1:N)"
+    vehicle_categories ||--o{ parking_slots : "categorizes (1:N)"
+    parking_slots ||--o{ bookings : "reserved in (1:N)"
+
+    users {
+    BigInt id PK
+    Varchar name
+    Varchar email UK
+    Enum role
+    Varchar password
+    }
+    parking_spaces {
+    BigInt id PK
+    BigInt owner_id FK
+    Varchar name
+    Text location_address
+    }
+    parking_slots {
+    BigInt id PK
+    BigInt space_id FK
+    BigInt category_id FK
+    Varchar slot_identifier
+    Boolean is_active
+    }
+    vehicle_categories {
+    BigInt id PK
+    Varchar name
+    Decimal base_charge
+    Decimal hourly_rate
+    }
+    bookings {
+    BigInt id PK
+    BigInt user_id FK
+    BigInt slot_id FK
+    Timestamp reservation_time
+    Enum status
+    Varchar vehicle_video
+    }
+  </div>
+
+  <div id="class_diagram" class="mermaid" style="margin-top: 100px;">
+    classDiagram
+    class User {
+    +BigInt id
+    +String name
+    +String email
+    +String role
+    +register()
+    +login()
+    +bookSlot()
+    }
+    class VehicleCategory {
+    +BigInt id
+    +String name
+    +Decimal base_charge
+    +Decimal hourly_rate
+    +getDynamicPricing()
+    }
+    class ParkingSpace {
+    +BigInt id
+    +BigInt owner_id
+    +String name
+    +String location
+    +addSlot()
+    +getAvailableSlots()
+    }
+    class ParkingSlot {
+    +BigInt id
+    +BigInt space_id
+    +BigInt category_id
+    +String slot_identifier
+    +Boolean is_active
+    +checkAvailability()
+    }
+    class Booking {
+    +BigInt id
+    +BigInt user_id
+    +BigInt slot_id
+    +Timestamp reservation_time
+    +String status
+    +String vehicle_video
+    +confirmBooking()
+    +cancelBooking()
+    }
+    class Vehicle {
+    +BigInt id
+    +String vehicle_number
+    +Timestamp entry_time
+    +Timestamp exit_time
+    +calculateCharge()
+    }
+
+    User "1" -- "*" Booking : makes
+    ParkingSpace "1" -- "*" ParkingSlot : contains
+    VehicleCategory "1" -- "*" ParkingSlot : categorizes
+    ParkingSlot "1" -- "*" Booking : reserved_in
+    User "1" -- "*" ParkingSpace : owns
+    ParkingSpace "1" -- "*" Vehicle : logs entrance
+  </div>
+
+  <div id="architecture" class="mermaid" style="margin-top: 100px;">
+    graph TD
+    subgraph Frontend UI
+    A1[Blade Templates]
+    A2[Bootstrap 5 / Tailwind]
+    A3[Alpine.js / JS]
+    end
+
+    subgraph Backend Laravel 12.x
+    B1[Routing & Middleware]
+    B2[Controllers: Booking, Owner, Admin]
+    B3[Eloquent ORM Models]
+    end
+
+    subgraph Database Layer
+    C1[(PostgreSQL Database)]
+    end
+
+    A1 -->|HTTP POST / GET| B1
+    A3 -->|AJAX / Fetch| B1
+    B1 --> B2
+    B2 --> B3
+    B3 -->|Read/Write with Locking| C1
+    C1 --> B3
+    B3 --> B2
+    B2 --> A1
+  </div>
+
+  <div id="sequence" class="mermaid" style="margin-top: 100px;">
+    sequenceDiagram
+    actor User
+    participant Frontend
+    participant Backend
+    participant DB as PostgreSQL
+
+    User->>Frontend: Select Slot & Time
+    Frontend->>Backend: POST /book-slot
+    Backend->>DB: Begin Transaction (FOR UPDATE)
+    DB-->>Backend: Lock Slot Row
+    Backend->>DB: Verify Conflict Free
+    DB-->>Backend: OK
+    Backend->>Frontend: Request 10MB Video
+    User->>Frontend: Upload Video
+    Frontend->>Backend: Storage /public/videos
+    Backend->>DB: INSERT Booking Record
+    DB-->>Backend: Success
+    Backend->>DB: Commit Transaction
+    Backend-->>Frontend: 200 OK + QR Code
+    Frontend-->>User: Show Confirmation
+  </div>
+
+  <div id="pipeline" class="mermaid" style="margin-top: 100px;">
+    graph LR
+    A[Requirement Gathering] --> B[Feasibility Study]
+    B --> C[System Design]
+    C --> D[Implementation & Coding]
+    D --> E[Testing & Quality Assurance]
+    E --> F[Deployment]
+    F --> G[Future Scalability]
+  </div>
+
+</body>
+
+</html>

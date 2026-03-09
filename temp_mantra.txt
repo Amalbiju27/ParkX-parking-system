@@ -1,0 +1,2484 @@
+
+
+
+
+
+
+
+
+
+
+
+
+Department of Computer Science
+
+
+
+FSD Project Report
+
+
+
+Mantra: Educational Productivity Platform
+
+
+
+
+
+Done by Aneeta Peter
+
+Reg No: 24118006
+
+
+
+
+
+
+
+
+
+Under the guidance of
+
+Mr. Ajay Antony Joseph
+
+
+
+2024-2028
+
+
+
+
+
+CERTIFICATE
+
+
+
+
+
+
+
+Mantra: Educational Productivity Platform
+
+Certified that this is the Bonafide record of project work done by
+
+Aneeta Peter Reg No: 24118006
+
+During the academic year 2024-2028, in partial fulfillment of requirements for award of the degree,
+
+
+
+Bachelor of Science in Computer Science of
+
+Rajagiri College of Social Sciences (Autonomous)
+
+
+
+
+
+
+
+Faculty Guide	Head of the Department
+
+Mr. Ajay Antony Joseph	Dr. Bindiya M Varghese
+
+
+
+
+
+External Examiner
+
+
+
+ACKNOWLEDGEMENT
+
+
+
+With heartfelt gratitude, I extend my deepest thanks to the Almighty for His unwavering grace and blessings that have made this journey possible. May His guidance continue to illuminate my path in the years ahead.
+
+
+
+I am immensely thankful to Dr. Bindiya M Varghese, head of the department of Computer Science, and Mr. Ajay Antony Joseph, my Faculty Guide, for their invaluable guidance and timely advice, which played a pivotal role in shaping this project. Their guidance, constant supervision, and provision of essential information were instrumental in the successful completion of the Project.
+
+
+
+I extend my profound thanks to all the professors in the department and the entire staff at RCSS for their unwavering support and inspiration throughout my academic journey. My sincere appreciation goes to my beloved parents, whose guidance has been a beacon in every step of my path.
+
+
+
+I am also grateful to my friends and individuals who generously shared their expertise and assistance, contributing significantly to the fulfillment of this endeavor.
+
+
+
+
+
+Aneeta Peter
+
+
+
+ABSTRACT
+
+
+
+Mantra is a comprehensive educational and productivity platform designed to enhance student potential through gamification and integrated study tools. Developed using the Laravel web framework, Mantra provides users with an engaging environment to manage their academic tasks, notes, and schedules interactively.
+
+
+
+The platform offers a suite of core features, including a dynamic Chat Interface for real-time collaboration and note-sharing, a gamified User Profile tracking system that rewards consistent study habits with Experience Points (XP), study streaks, and achievements, and a Smart Notes feature capable of automatically extracting and organizing text from uploaded PDF and DOCX documents. Additionally, an interactive Calendar mechanism allows users to easily manage new tasks, while the entire system tracks and visually displays total study time and academic milestones. By combining the social elements of real-time communication via WebSockets with robust productivity features, Mantra creates a streamlined, rewarding, and highly effective digital workspace that encourages continuous learning and collaboration among students.
+
+
+
+Use Case Descriptions for the Mantra Platform	5
+
+Users Table Schema	16
+
+Todos Table Schema	17
+
+Events Table Schema	17
+
+Password Reset OTPs Table Schema	18
+
+Quizzes Table Schema	18
+
+Questions Table Schema	18
+
+Channel Visits Table Schema	19
+
+Notes Table Schema	19
+
+Folders Table Schema	20
+
+Tags Table Schema	20
+
+Note Tag Pivot Table Schema	20
+
+Friend Requests Table Schema	21
+
+Friends Table Schema	21
+
+Messages Table Schema	21
+
+Blocks Table Schema	22
+
+Sessions Table Schema	22
+
+Unit Test Cases for Mantra	30
+
+Integration Test Cases for Mantra	31
+
+System Test Cases for Mantra	32
+
+Performance Test Cases for Mantra	33
+
+
+
+
+
+
+
+
+
+Use Case Diagram for Mantra	6
+
+Activity Diagram for the Mantra Platform	11
+
+Mantra System Architecture	13
+
+Mantra Logo & Dashboard Icon	13
+
+Main Web Application Profile Dashboard	14
+
+Interactive Calendar Interface	14
+
+Real-Time Collaboration Chat Interface	15
+
+Smart Notes Document Library	15
+
+System Class Diagram	23
+
+Entity-Relationship (ER) Diagram	23
+
+System Sequence Diagram	25
+
+Code snippet detailing Note creation and XP/Streak gamification processing.	26
+
+Project Development Pipeline	28
+
+Mantra Laravel Source Code Folder Structure	35
+
+Repository Build History	37
+
+
+
+
+
+
+
+
+
+
+
+ACKNOWLEDGEMENT
+
+i
+
+ABSTRACT
+
+ii
+
+LIST OF TABLES
+
+iii
+
+LIST OF FIGURES
+
+iv
+
+1	INTRODUCTION
+
+1
+
+2	SUPPORTING LITERATURE
+
+2
+
+2.1	Overview  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+2
+
+2.2	Laravel Documentation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+2
+
+2.3	WebSocket Specifications . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+2
+
+2.4	Document Parsing Libraries	. . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+2
+
+3	SYSTEM ANALYSIS
+
+3
+
+3.1	Module Description . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+3
+
+3.2	Business Rules	. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+4
+
+3.3	Use Case Model . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+5
+
+3.3.1	Use Case Descriptions . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+5
+
+3.3.2	Use Case Diagram  . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+5
+
+3.4	Analysis of Architecture	. . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+7
+
+3.4.1	Key Algorithms . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+7
+
+3.5	Feasibility Analysis . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+8
+
+3.5.1	Technical Feasibility . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+8
+
+3.5.2	Economical Feasibility . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+8
+
+3.5.3	Operational Feasibility . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+9
+
+3.6	System Environment  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+9
+
+3.6.1	Software Environment . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+9
+
+3.6.2	Hardware Environment . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+9
+
+3.7	Actors and Roles  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+9
+
+3.8	Activity Diagram . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+11
+
+4	SYSTEM DESIGN
+
+12
+
+4.1	Project Design . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+12
+
+4.1.1	User Interface (UI) Design . . . . . . . . . . . . . . . . . . . . . . . .
+
+12
+
+4.1.2	System Architecture Diagram  . . . . . . . . . . . . . . . . . . . . . .
+
+12
+
+
+
+4.1.3
+
+Database
+
+Design  . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+16
+
+
+
+4.1.3.1
+
+Core Application Tables . . . . . . . . . . . . . . . . . . . .
+
+16
+
+
+
+4.1.3.2
+
+Gamification & Learning Tables	. . . . . . . . . . . . . . .
+
+18
+
+
+
+4.1.3.3
+
+Notes & Organization Tables  . . . . . . . . . . . . . . . . .
+
+19
+
+
+
+4.1.3.4
+
+Social & Chat Tables	. . . . . . . . . . . . . . . . . . . . .
+
+20
+
+
+
+4.1.3.5
+
+Laravel Framework Tables	. . . . . . . . . . . . . . . . . .
+
+22
+
+
+
+4.1.4	Class Diagram  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+22
+
+
+
+4.1.5	Entity-Relationship (ER) Diagram . . . . . . . . . . . . . . . . . . . .
+
+23
+
+
+
+4.1.6	Sequence Diagram . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+24
+
+
+
+4.1.7	Smart Document Parsing Design . . . . . . . . . . . . . . . . . . . . .
+
+26
+
+
+
+4.1.8	Real-time Notification Design . . . . . . . . . . . . . . . . . . . . . .
+
+26
+
+4.2
+
+Project Pipeline . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+27
+
+
+
+TESTING	29
+
+Unit Testing	29
+
+Integration Testing	31
+
+System Testing	32
+
+Performance Testing	33
+
+DEPLOYMENT	34
+
+Folder Structure	34
+
+Key Directories	36
+
+GIT HISTORY	37
+
+CONCLUSIONS	38
+
+FUTURE WORKS	39
+
+APPENDIX	40
+
+Minimum Software Requirements	40
+
+Minimum Hardware Requirements	40
+
+
+
+
+
+
+
+INTRODUCTION
+
+
+
+Mantra is an innovative educational productivity platform designed to foster a more engaging and effective learning experience. By blending traditional study utilities such as calendars, note taking, document management, and communication tools with powerful gamification elements, Mantra aims to transform the way users interact with their daily academic tasks.
+
+In today’s fast-paced digital learning environment, staying organized and maintaining motivation are significant challenges. Mantra addresses these challenges by structurally rewarding consistent study habits. Users earn Experience Points (XP), maintain consecutive activity streaks, and unlock profile achievements as they utilize the platform to study and collaborate.
+
+Developed as a highly responsive web application using the Laravel 12.x PHP framework (operating on PHP 8.2), Mantra ensures a secure and scalable backend architecture. Its diverse frontend is constructed using modern HTML5, CSS3, and vanilla JavaScript for maximum user interactivity. From an integrated interactive calendar to manage upcoming assignments, to real time chat powered by WebSockets for instant student collaboration, Mantra provides a comprehensive suite of utilities. Furthermore, Mantra implements an advanced “Smart Notes” system, allowing users to upload documents (such as PDFs and DOCX files) and instantly automatically extract the content into editable, shareable notes. By providing an all-in-one companion that motivates, organizes, and socially connects learners, Mantra aims to redefine modern academic task management and user engagement.
+
+
+
+
+
+SUPPORTING LITERATURE
+
+
+
+Overview
+
+Building a modern web application like Mantra requires standing on the shoulders of robust, open-source literature and documentation. In the development of this educational productivity platform, several key framing documents, architecture guides, and API specifications were deeply analyzed.
+
+
+
+Laravel Documentation
+
+The primary literature driving the backend systems of Mantra is the official Laravel 12.x Documentation. This comprehensive guide dictates the structural MVC routing, Eloquent ORM relationships, and Blade templating methodologies used to render the gamified profile and calendar.
+
+
+
+WebSocket Specifications
+
+To achieve real-time, bidirectional communication for the Chat module without continuous HTTP polling, the RFC 6455 WebSocket protocol specification was studied. This literature outlines the handshake process, payload masking, and persistent connection strategies. Implementations like Pusher and Laravel WebSockets strictly adhere to these guidelines to broadcast messages instantly to students collaborating online.
+
+
+
+Document Parsing Libraries
+
+The Smart Notes module necessitates accurately extracting raw text from PDFs and DOCX files. Literature regarding PHP document processing libraries (such as Spatie’s PDF-to-Text and PHPWord documentation) provided the foundational methodology for reading file streams, decoding proprietary formats, and pushing translated strings into the database relationally.
+
+
+
+
+
+SYSTEM ANALYSIS
+
+
+
+Module Description
+
+The “Mantra” productivity and study platform is divided into multiple functional modules, each playing a key role in ensuring a smooth user experience, promoting learning, and incorporating gamification. The main modules include:
+
+Gamification & Profile Module: This module is responsible for keeping the user motivated and tracking their academic progress over time. It visually displays critical study metrics, including user achievements, rewards, study streaks, total study time, and Experience Points (XP). By translating time spent studying into quantifiable rewards, it encourages users to stick to their academic tasks.
+
+Calendar & Schedule Module: This module serves as the organizational hub for the student. It visually lays out assignments, ongoing tasks, and goals on an interactive calendar. Recent updates feature refined user experiences, such as displaying a dynamic loading indicator when new tasks are added to prevent UI freezing and confusion.
+
+Real-Time Chat & Collaboration Module: This module is vital for student socialization. It leverages WebSockets to enable instant, real-time message delivery between peers without requiring page reloads. Moreover, this module includes unique features such as a “Share Note” modal, which lets users select a previously written Smart Note and share its content to their friends directly within the chat interface. It also accommodates a music widget to promote focused study sessions.
+
+Smart Notes & File Extraction Module: This module addresses document organization and content generation. Users can securely upload documents (such as PDF and DOCX files), which are scanned by the system. The module extracts the internal text and presents it via a “Save to Notes” dialog. Users can organize these extracted texts into specific folders, seamlessly transforming static files into editable, shareable Smart Notes.
+
+Progress & Analytics Module: Working closely with the Gamification Module, this module manages the accurate calculation and visual display of a user’s total active productivity time. It handles data edge cases naturally; for instance, ensuring that values of exactly zero are properly reflected on the dashboard rather than appearing missing or leading to null errors.
+
+
+
+
+
+Business Rules
+
+Business rules define how processes and activities should be conducted to ensure consistency across the application.
+
+
+
+Note Extraction & Management
+
+All user-uploaded files must adhere to supported extensions (e.g., PDF, DOCX, TXT) to execute successfully through the Smart Notes text extraction engine.
+
+Extracted files must prompt the user with a mandatory folder selection dialog before being formally instantiated as an editable Note.
+
+Collaboration Mechanics
+
+Chat messages must be pushed via WebSockets connecting participants instantly. Users must be authenticated to actively send and receive messages.
+
+To share notes, the user must own the note, ensuring data privacy and preventing unauthorized access to others’ notes.
+
+Gamification & Tracking
+
+Experience Points (XP) are strictly calculated based on the execution of academic tasks, creation of notes, and accumulation of total study time.
+
+Study streaks increment purely based on active daily interaction with the core studying components, promoting a strong learning habit.
+
+
+
+
+
+Use Case Model
+
+The Use Case Model identifies the key interactions between the Student (the sole actor) and the Mantra platform. Since there is only a single user type, all use cases revolve around the student’s academic workflow.
+
+
+
+Use Case Descriptions
+
+
+
+
+
+ID
+
+Use Case
+
+Description
+
+UC01
+
+Register / Login
+
+The student creates a new account or authenti- cates with existing credentials to access the plat- form.
+
+UC02
+
+Manage	Calendar Tasks
+
+The student adds, edits, or removes tasks and deadlines on the interactive calendar.
+
+UC03
+
+Create & Organize Notes
+
+The student creates new Smart Notes manually and organizes them into folders.
+
+UC04
+
+Upload & Extract Documents
+
+The student uploads PDF/DOCX files; the sys- tem extracts text and saves it as an editable note (includes UC03).
+
+UC05
+
+Chat with Peers
+
+The student sends and receives real-time mes- sages with friends via WebSockets.
+
+UC06
+
+Share	Notes	in Chat
+
+The student selects a note from their library and shares it inside the chat interface (includes UC05).
+
+UC07
+
+Send	/	Accept Friend Requests
+
+The student sends friend requests to peers and ac- cepts or rejects incoming requests.
+
+UC08
+
+Earn XP & Main- tain Streaks
+
+XP and streak values are automatically up- dated when the student completes tasks, creates notes, or accumulates study time (extends UC02, UC03).
+
+UC09
+
+View	Profile	& Achievements
+
+The student views their accumulated XP, study streaks, total study time, and unlocked achieve- ments.
+
+Table 3.1: Use Case Descriptions for the Mantra Platform
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Use Case Diagram
+
+The following diagram visually represents the interactions between the Student actor and the system use cases.
+
+
+
+
+
+
+
+Figure 3.1: Use Case Diagram for Mantra
+
+
+
+
+
+Analysis of Architecture
+
+Laravel Framework (PHP 8.2)
+
+
+
+Mantra is primarily built on the Laravel 12.x PHP framework, utilizing an MVC (Model-View- Controller) architecture to guarantee clean, scalable, and secure application code.
+
+
+
+Backend Architecture (MVC):
+
+The Model layer manages the data relationships inside the PostgreSQL database, ensuring data integrity for things like user notes, milestones, and shared files.
+
+The Controller layer processes business logic, such as extracting text from uploaded PDFs and calculating XP based on actions.
+
+The View layer employs Laravel’s Blade templating engine for assembling dynamic and responsive web pages.
+
+WebSocket Real-Time Engine:
+
+To achieve instantaneous message delivery inside the Chat Module, WebSockets are utilized to bypass traditional HTTP polling constraints.
+
+Data Security & Storage:
+
+File upload streams and extracted note files are managed securely by the Laravel storage facilities, preventing malicious payloads or exposure to unauthorized users.
+
+
+
+Key Algorithms
+
+The following algorithms drive Mantra’s core computational logic:
+
+XP Calculation Algorithm
+
+
+
+Experience Points are awarded based on discrete academic actions. Each qualifying event (e.g., creating a note, completing a calendar task) triggers an increment to the user’s cumulative XP field in the database. The algorithm queries the user’s current XP, applies the reward delta, and persists the updated value atomically via Eloquent ORM to prevent race conditions.
+
+Streak Tracking Algorithm
+
+
+
+The streak counter evaluates whether the student has interacted with any core study compo- nent within the current calendar day. On first daily interaction, the system compares the current date against the user’s last recorded activity timestamp. If the gap is exactly one day, the streak increments; if the gap exceeds one day, the streak resets to one. This comparison is performed server-side using PHP’s Carbon date library to ensure timezone-independent accuracy.
+
+
+
+
+
+Document Text Extraction Algorithm
+
+
+
+When a user uploads a PDF or DOCX file, the backend invokes the appropriate parsing library based on the file type. The algorithm reads the binary file stream, decodes internal formatting layers, extracts raw text content, and presents it for folder assignment before persisting to the Notes table. (See Section 4.1.5 for the full design.)
+
+WebSocket Message Broadcasting Algorithm
+
+
+
+When a student sends a chat message, the Controller persists the message record and then broadcasts an event payload over a dedicated WebSocket channel. The receiver’s client-side listener dynamically appends the new message element without a page reload. (See Section 4.1.6 for the full design.)
+
+
+
+Feasibility Analysis
+
+Technical Feasibility
+
+Technical feasibility assesses whether the project can be structurally developed and maintained with contemporary technology.
+
+
+
+The tech stack for Mantra makes the project highly feasible. PHP 8.2 via Laravel 12.x provides strong out-of-the-box features like built-in authentication, database query builders, robust rout- ing, and file management. Processing PDF and DOCX files to extract text is achieved through specialized open-source PHP libraries (such as Spatie’s pdf-to-text or PHPWord), which in- tegrate efficiently into the core logic. WebSockets handle real-time concurrency for chat and social integrations seamlessly. The robust, MVC-driven foundation ensures that introducing new visual gamification assets or calendar enhancements is a straightforward process handled directly via Blade files paired with Bootstrap and JavaScript.
+
+
+
+Economical Feasibility
+
+The economic feasibility of the Mantra platform relies on maximizing impact while minimiz- ing recurring digital costs. Because the application utilizes open-source resources like PHP 8.2, the Laravel 12.x Framework, and a PostgreSQL database layer, upfront licensing costs are practically eliminated. Furthermore, WebSocket broadcasting can be managed by affordable, self-hosted solutions or free-tier community APIs. Hosting and deploying a Laravel applica- tion represents a well-documented and cost-effective approach requiring minimal specialized overhead. As such, Mantra represents an economically sound and highly scalable project.
+
+
+
+
+
+Operational Feasibility
+
+The operational feasibility evaluates whether the product achieves the business goal of a smoothly integrated and friction-free user process.
+
+
+
+Mantra demonstrates strong operational feasibility because of its centralized, all-in-one produc- tivity workflow. By converging isolated tools—text extraction, real-time messaging, calendar organization, and progress trackers—into a single unified dashboard, it simplifies a student’s technical overhead. Gamification strategies systematically reduce friction by offering visual XP incentives and daily streak rewards, creating a recurring retention loop.
+
+
+
+System Environment
+
+Software Environment
+
+Backend: Laravel 12.x (PHP 8.2) — MVC framework handling routing, authentication, and business logic.
+
+Frontend: Blade templates, HTML5, CSS3, Bootstrap, and vanilla JavaScript.
+
+Database: PostgreSQL — relational storage for users, notes, messages, and friend re- quests.
+
+Real-Time: WebSocket endpoints for live chat message delivery.
+
+Document Parsing: Spatie PDF-to-Text and PHPWord libraries for Smart Notes extrac- tion.
+
+
+
+Hardware Environment
+
+Supported Clients: Modern Web Browsers (Chrome, Firefox, Safari, Edge)
+
+
+
+Server Operating System: Linux / Windows Server environment
+
+
+
+Memory (Server RAM): Minimum 2 GB (4 GB recommended to handle file parsers)
+
+
+
+Storage: Based on expected file upload capacities (10GB+ SSD minimum Recommended)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Actors and Roles
+
+Mantra operates with a single user type. There is no administrative panel or multi-role hierar- chy; every registered account shares the same privileges and feature access.
+
+
+
+Student (Primary and Only User): The student is the sole actor within the Mantra plat- form. They register an account, log in securely, and gain full access to all available features. This includes managing tasks and deadlines via the interactive calendar, earning Experience Points (XP) and maintaining daily study streaks through consistent platform engagement, ex- changing real-time messages with peers via the WebSocket-powered chat interface, uploading PDF and DOCX documents to be automatically transcribed into editable Smart Notes, orga- nizing notes into personal folders, and sharing notes with friends directly through the chat. Students own all of their data and collaborate exclusively with other students on the platform.
+
+
+
+
+
+Activity Diagram
+
+The Activity Diagram illustrates the end-to-end workflow a student follows when using Mantra, from authentication through to the various feature interactions. It captures the decision points, parallel actions, and feedback loops that define the student’s experience on the platform.
+
+
+
+
+
+Figure 3.2: Activity Diagram for the Mantra Platform
+
+
+
+As shown in the diagram, every student interaction flows through the authenticated dashboard. Core actions such as managing calendar tasks, creating or uploading notes, and chatting with peers each follow distinct paths, but all converge back to the dashboard upon completion. Im- portantly, gamification events (XP awards and streak increments) are triggered automatically as side-effects of productive actions like task completion and note creation, reinforcing the engagement loop without requiring explicit student intervention.
+
+
+
+
+
+SYSTEM DESIGN
+
+
+
+Project Design
+
+System design involves planning the structure, components, data flows, and interfaces of an ap- plication to fulfill a set of specific requirements organically. Strong system design ensures the product has room to grow, avoids architectural bottlenecks, and delivers a robust, responsive feedback loop to the end user.
+
+
+
+In Mantra, the system architecture operates via an MVC structure specifically customized to favor engagement. Unlike standard productivity apps, Mantra implements gamification into its very core. It balances essential educational utilities with social chat mechanics and an achievement-based XP system designed to make continuous participation rewarding.
+
+
+
+User Interface (UI) Design
+
+Mantra’s user interface is built for modern accessibility, maintaining visual consistency through unified components such as shared icons (‘mantra.png‘) and sleek, dynamic dashboards. Key features of the UI include:
+
+Gamified Profile Dashboard: Clicking on any user’s profile opens a designated view that meticulously presents their accumulated Experience Points (XP), total study time, current daily streak, and earned visual achievements. This component encourages friendly competition and motivates personal consistency.
+
+Interactive Calendar Interface: The calendar enables seamless schedule management. UX optimizations—such as dynamic loading indicators explicitly revealing to users when tasks are actively resolving in the backend—help preserve interaction fluidity and prevent double-submissions.
+
+Collaboration Chat Window: A persistent chat framework integrates directly with the productivity environment using Bootstrap modals. Included inside the chat is a seamless ’Share Note’ modal, preventing context-switching when communicating essential study materials.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+System Architecture Diagram
+
+The System Architecture diagram maps the communication pathways between the frontend client, the backend Laravel framework, the WebSocket server for real-time messaging, and the PostgreSQL database layer.
+
+
+
+
+
+Figure 4.1: Mantra System Architecture
+
+
+
+
+
+Figure 4.2: Mantra Logo & Dashboard Icon
+
+
+
+
+
+
+
+Figure 4.3: Main Web Application Profile Dashboard
+
+
+
+
+
+Figure 4.4: Interactive Calendar Interface
+
+
+
+
+
+
+
+Figure 4.5: Real-Time Collaboration Chat Interface
+
+
+
+
+
+Figure 4.6: Smart Notes Document Library
+
+
+
+
+
+Database Design
+
+Data storage is engineered relationally via PostgreSQL, emphasizing relational continuity be- tween users and their gamified metadata. The complete database schema consists of 16 tables organized across five functional categories: Core Application, Gamification & Learning, Notes & Organization, Social & Chat, and Laravel Framework tables.
+
+
+
+Core Application Tables
+
+Users Table
+
+Central authentication table retaining credentials alongside gamification totals for XP, streaks, study duration, and user preferences.
+
+
+
+Field Name
+
+Data Type
+
+Description
+
+id
+
+BigInt
+
+Primary Key, Auto-increment
+
+name
+
+String
+
+The user’s full name
+
+email
+
+String
+
+Unique email address for authentication
+
+email verified at
+
+Timestamp
+
+Email verification timestamp (nullable)
+
+password
+
+String
+
+Hashed password
+
+remember token
+
+String
+
+Session remember token
+
+preferences
+
+JSON
+
+User preferences such as language and theme (nullable)
+
+xp
+
+Integer
+
+Total Experience Points earned (default 0)
+
+current streak
+
+Integer
+
+Current consecutive days studied (default 0)
+
+last study date
+
+DateTime
+
+Last recorded study activity date (nullable)
+
+total study seconds
+
+BigInt
+
+Total accumulated active study time in sec- onds
+
+badges
+
+JSON
+
+Earned badge data (nullable)
+
+stickers
+
+JSON
+
+Earned sticker data (nullable)
+
+quiz attempts
+
+JSON
+
+History of quiz attempt records (nullable)
+
+created at
+
+Timestamp
+
+Record creation date
+
+updated at
+
+Timestamp
+
+Record last modification date
+
+Table 4.1: Users Table Schema
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Todos Table
+
+Stores individual to-do task items linked to users for daily productivity tracking.
+
+
+
+Field Name
+
+Data Type
+
+Description
+
+id
+
+BigInt
+
+Primary Key, Auto-increment
+
+user id
+
+BigInt
+
+Foreign Key referencing Users table
+
+text
+
+String
+
+The to-do task description
+
+completed
+
+Boolean
+
+Whether the task is completed (default false)
+
+created at
+
+Timestamp
+
+Record creation date
+
+updated at
+
+Timestamp
+
+Record last modification date
+
+Table 4.2: Todos Table Schema
+
+
+
+Events Table
+
+Manages calendar events with support for recurrence, reminders, priority levels, and color- coded categorization.
+
+
+
+Table 4.3: Events Table Schema
+
+
+
+Field Name
+
+Data Type
+
+Description
+
+id
+
+BigInt
+
+Primary Key, Auto-increment
+
+user id
+
+BigInt
+
+Foreign Key referencing Users table
+
+date
+
+Date
+
+Event date (nullable)
+
+title
+
+String
+
+Event title
+
+type
+
+String
+
+Event category (exam, study, meeting, birth- day)
+
+start datetime
+
+DateTime
+
+Event start date and time (nullable)
+
+end datetime
+
+DateTime
+
+Event end date and time (nullable)
+
+description
+
+Text
+
+Detailed event description (nullable)
+
+color
+
+String(7)
+
+Hex color code for event display (nullable)
+
+reminder
+
+Enum
+
+Reminder setting (none,	at time,	5min, 10min, 1hour, 1day)
+
+is recurring
+
+Boolean
+
+Whether the event repeats (default false)
+
+recurrence rule
+
+Enum
+
+Recurrence	frequency	(daily,	weekly, monthly, yearly)
+
+parent event id
+
+BigInt
+
+FK to parent event for recurring instances (nullable)
+
+status
+
+Enum
+
+Event status (pending, in progress, com- pleted, cancelled)
+
+priority
+
+Enum
+
+Priority level (low, medium, high)
+
+reminder sent at
+
+Timestamp
+
+When the reminder notification was dis- patched
+
+created at
+
+Timestamp
+
+Record creation date
+
+updated at
+
+Timestamp
+
+Record last modification date
+
+
+
+
+
+Password Reset OTPs Table
+
+Manages one-time passwords for email-based password recovery with expiration support.
+
+
+
+Field Name
+
+Data Type
+
+Description
+
+id
+
+BigInt
+
+Primary Key, Auto-increment
+
+email
+
+String
+
+Indexed email address of the requesting user
+
+otp
+
+String
+
+The one-time password code
+
+expires at
+
+Timestamp
+
+OTP expiration timestamp
+
+created at
+
+Timestamp
+
+Record creation date
+
+updated at
+
+Timestamp
+
+Record last modification date
+
+Table 4.4: Password Reset OTPs Table Schema
+
+
+
+Gamification & Learning Tables
+
+Quizzes Table
+
+Records quiz sessions created for users, storing quiz metadata and final scores.
+
+
+
+Field Name
+
+Data Type
+
+Description
+
+id
+
+BigInt
+
+Primary Key, Auto-increment
+
+user id
+
+BigInt
+
+Foreign Key referencing Users table (cas- cade delete)
+
+title
+
+String
+
+Quiz title
+
+score
+
+Integer
+
+Final quiz score (nullable until completed)
+
+created at
+
+Timestamp
+
+Record creation date
+
+updated at
+
+Timestamp
+
+Record last modification date
+
+Table 4.5: Quizzes Table Schema
+
+
+
+Questions Table
+
+Stores individual quiz questions with multiple-choice options and correct answers.
+
+
+
+Field Name
+
+Data Type
+
+Description
+
+id
+
+BigInt
+
+Primary Key, Auto-increment
+
+quiz id
+
+BigInt
+
+Foreign Key referencing Quizzes table (cas- cade delete)
+
+question
+
+Text
+
+The question text
+
+options
+
+JSON
+
+Array of multiple-choice answer options
+
+answer
+
+String
+
+The correct answer
+
+created at
+
+Timestamp
+
+Record creation date
+
+updated at
+
+Timestamp
+
+Record last modification date
+
+Table 4.6: Questions Table Schema
+
+
+
+
+
+Channel Visits Table
+
+Tracks educational YouTube channel visits by users for study resource recommendations.
+
+
+
+Field Name
+
+Data Type
+
+Description
+
+id
+
+BigInt
+
+Primary Key, Auto-increment
+
+user id
+
+BigInt
+
+Foreign Key referencing Users table
+
+channel name
+
+String
+
+Name of the visited YouTube channel
+
+channel url
+
+String
+
+URL of the channel
+
+channel image
+
+String
+
+Channel thumbnail image URL (nullable)
+
+created at
+
+Timestamp
+
+Record creation date
+
+updated at
+
+Timestamp
+
+Record last modification date
+
+Table 4.7: Channel Visits Table Schema
+
+
+
+Notes & Organization Tables
+
+Notes Table
+
+Tracks parsed note entries mapped to users and folders, supporting file uploads and pinning.
+
+
+
+Field Name
+
+Data Type
+
+Description
+
+id
+
+BigInt
+
+Primary Key, Auto-increment
+
+user id
+
+BigInt
+
+Foreign Key referencing Users table
+
+title
+
+String
+
+Note title or filename
+
+content
+
+LongText
+
+Extracted document text or edited notes
+
+file path
+
+String
+
+Path to the uploaded source file (nullable)
+
+folder id
+
+BigInt
+
+Foreign Key referencing Folders table (nul- lable)
+
+is pinned
+
+Boolean
+
+Whether the note is pinned to top (default false)
+
+created at
+
+Timestamp
+
+Note creation date
+
+updated at
+
+Timestamp
+
+Note last modification date
+
+Table 4.8: Notes Table Schema
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Folders Table
+
+Provides hierarchical organization for user notes.
+
+
+
+Field Name
+
+Data Type
+
+Description
+
+id
+
+BigInt
+
+Primary Key, Auto-increment
+
+user id
+
+BigInt
+
+Foreign Key referencing Users table (cas- cade delete)
+
+name
+
+String
+
+Folder name
+
+created at
+
+Timestamp
+
+Record creation date
+
+updated at
+
+Timestamp
+
+Record last modification date
+
+Table 4.9: Folders Table Schema
+
+
+
+Tags Table
+
+User-defined tags with custom colors for categorizing notes.
+
+
+
+Field Name
+
+Data Type
+
+Description
+
+id
+
+BigInt
+
+Primary Key, Auto-increment
+
+user id
+
+BigInt
+
+Foreign Key referencing Users table (cas- cade delete)
+
+name
+
+String
+
+Tag label
+
+color
+
+String
+
+Display color for the tag (nullable)
+
+created at
+
+Timestamp
+
+Record creation date
+
+updated at
+
+Timestamp
+
+Record last modification date
+
+Table 4.10: Tags Table Schema
+
+
+
+Note Tag Table (Pivot)
+
+Many-to-many relationship table linking notes to their assigned tags.
+
+
+
+Field Name
+
+Data Type
+
+Description
+
+id
+
+note id
+
+
+
+tag id
+
+BigInt BigInt
+
+
+
+BigInt
+
+Primary Key, Auto-increment
+
+Foreign Key referencing Notes table (cas- cade delete)
+
+Foreign Key referencing Tags table (cascade delete)
+
+Table 4.11: Note Tag Pivot Table Schema
+
+
+
+
+
+
+
+
+
+
+
+Social & Chat Tables
+
+Friend Requests Table
+
+Manages pending, accepted, and rejected friend requests between users with unique constraint preventing duplicates.
+
+
+
+Field Name
+
+Data Type
+
+Description
+
+id
+
+BigInt
+
+Primary Key, Auto-increment
+
+sender id
+
+BigInt
+
+Foreign Key referencing Users table (cas- cade delete)
+
+receiver id
+
+BigInt
+
+Foreign Key referencing Users table (cas- cade delete)
+
+status
+
+Enum
+
+Request status (pending, accepted, rejected)
+
+created at
+
+Timestamp
+
+Record creation date
+
+updated at
+
+Timestamp
+
+Record last modification date
+
+Table 4.12: Friend Requests Table Schema
+
+
+
+Friends Table
+
+Stores confirmed friendship pairs between users with a unique constraint on the pair.
+
+
+
+Field Name
+
+Data Type
+
+Description
+
+id
+
+BigInt
+
+Primary Key, Auto-increment
+
+user id
+
+BigInt
+
+Foreign Key referencing Users table (cas- cade delete)
+
+friend id
+
+BigInt
+
+Foreign Key referencing Users table (cas- cade delete)
+
+created at
+
+Timestamp
+
+Record creation date
+
+updated at
+
+Timestamp
+
+Record last modification date
+
+Table 4.13: Friends Table Schema
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Messages Table
+
+Stores chat message contents with sender/receiver mappings and read status indicators.
+
+
+
+Field Name
+
+Data Type
+
+Description
+
+id
+
+BigInt
+
+Primary Key, Auto-increment
+
+sender id
+
+BigInt
+
+Foreign Key referencing Users table (cas- cade delete)
+
+receiver id
+
+BigInt
+
+Foreign Key referencing Users table (cas- cade delete)
+
+message
+
+Text
+
+The message payload or Shared Note indica- tor
+
+is read
+
+Boolean
+
+Flag indicating if the receiver viewed the message
+
+created at
+
+Timestamp
+
+Message delivery timestamp
+
+updated at
+
+Timestamp
+
+Record last modification date
+
+Table 4.14: Messages Table Schema
+
+
+
+Blocks Table
+
+Records user-initiated blocks to prevent unwanted interactions between users.
+
+
+
+Field Name
+
+Data Type
+
+Description
+
+id
+
+BigInt
+
+Primary Key, Auto-increment
+
+user id
+
+BigInt
+
+Foreign Key referencing Users table (cas- cade delete)
+
+blocked id
+
+BigInt
+
+Foreign Key referencing Users table (cas- cade delete)
+
+created at
+
+Timestamp
+
+Record creation date
+
+updated at
+
+Timestamp
+
+Record last modification date
+
+Table 4.15: Blocks Table Schema
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Laravel Framework Tables
+
+Sessions Table
+
+Manages active user sessions for the database session driver.
+
+
+
+Field Name
+
+Data Type
+
+Description
+
+id
+
+String
+
+Primary Key, session identifier
+
+user id
+
+BigInt
+
+Foreign Key referencing Users table (nul- lable)
+
+ip address
+
+String(45)
+
+Client IP address (nullable)
+
+user agent
+
+Text
+
+Client browser user agent string (nullable)
+
+payload
+
+LongText
+
+Serialized session data
+
+last activity
+
+Integer
+
+Unix timestamp of last session activity (in- dexed)
+
+Table 4.16: Sessions Table Schema
+
+
+
+Class Diagram
+
+The Class Diagram models the core structural components of Mantra, including the primary entities and their respective responsibilities inside the object-oriented architecture.
+
+
+
+
+
+
+
+
+
+Figure 4.7: System Class Diagram
+
+
+
+
+
+Entity-Relationship (ER) Diagram
+
+The ER Diagram illustrates the logical data architecture stored within the PostgreSQL database. It highlights how user authenticated identities correspond relationally to their accumulated notes and chat histories.
+
+
+
+Figure 4.8: Entity-Relationship (ER) Diagram
+
+
+
+
+
+Sequence Diagram
+
+The Sequence Diagram traces the synchronous and asynchronous execution paths when a user interacts with Mantra’s primary features, particularly focusing on Smart Note extraction and WebSocket message broadcasting.
+
+
+
+
+
+
+
+Smart Document Parsing Design
+
+The core conversion engine is designed to facilitate quick study note generation. When a doc- ument (such as a plain text string or basic document data) is provided into Mantra via the interface, a backend Laravel Controller translates the textual content into a standardized plain- text/HTML format, and subsequently injects this data into the creation workflow of a new Smart Note. The framework prompts the user with a customized modal dialog explicitly asking for the destination folder before officially migrating the parsed text to the PostgreSQL Notes table.
+
+
+
+Figure 4.10: Code snippet detailing Note creation and XP/Streak gamification processing.
+
+
+
+Real-time Notification Design
+
+Web application polling is significantly detrimental to large scale chat systems. Therefore, Mantra’s message pipeline adopts the Publish/Subscribe (PubSub) design pattern using Web- Sockets. When User A shares a generated Smart Note with User B, the backend Controller commits the relational record to the DB, and simultaneously broadcasts an asynchronous event over the WebSocket channel. User B’s interface listens to this channel, dynamically spawning the message DOM element without ever having to refresh the active web page.
+
+
+
+
+
+Project Pipeline
+
+The Project Pipeline outlines the systematic development workflow followed during the cre- ation of the Mantra platform, from initial requirements gathering through final deployment and maintenance.
+
+Requirements Analysis: Identified the core needs of the target user (students) — task management, note-taking, peer collaboration, and motivation through gamification. De- fined the functional and non-functional requirements that would guide all subsequent phases.
+
+System Design: Designed the MVC architecture using the Laravel framework, planned the PostgreSQL relational database schema (Users, Notes, Messages, FriendRequests tables), and specified the WebSocket integration for real-time chat delivery.
+
+Frontend Development: Constructed the user interface using Laravel Blade templates, HTML5, CSS3, Bootstrap, and vanilla JavaScript. Built interactive components includ- ing the calendar widget, chat window, Smart Notes editor, and the gamified profile dash- board.
+
+Backend Development: Implemented Laravel Controllers to handle authentication, note creation, file upload processing, XP/streak calculations, and friend request management. Integrated document parsing libraries (Spatie PDF-to-Text, PHPWord) for the Smart Notes extraction engine.
+
+Real-Time Integration: Configured WebSocket channels for the chat module, imple- menting the Publish/Subscribe pattern to enable instantaneous message broadcasting and the Share Note feature between peers.
+
+Testing: Executed comprehensive testing across Unit, Integration, System, and Perfor- mance layers to validate individual components, inter-module connectivity, end-to-end system behavior, and load resilience.
+
+Version Control: Managed all source code changes through Git, maintaining a com- plete history of commits, feature branches, and iterative improvements throughout the development lifecycle.
+
+Deployment: Packaged the Laravel application for production deployment on a Lin- ux/Windows server environment with PostgreSQL, ensuring all environment configura- tions, storage permissions, and WebSocket services are properly initialized.
+
+
+
+
+
+
+
+
+
+Figure 4.11: Project Development Pipeline
+
+
+
+
+
+TESTING
+
+
+
+Testing is a crucial part of web development, ensuring that the application runs smoothly, is secure, and provides a continuous, bug-free experience for users. Without proper testing, an application may possess glitches or broken mechanics that severely frustrate users. The Mantra testing methodology involves multiple layers of verification including Unit testing, Integration testing, System testing, and Performance testing to guarantee the calendar, chat, smart notes, and gamification suites work dependably.
+
+
+
+Unit Testing
+
+Unit testing focuses on evaluating individual components and classes within the Laravel web framework, such as checking if user interactions trigger correct local state changes, or ensur- ing isolated API logic calculates Gamification XP correctly. By implementing unit tests via frameworks like PHPUnit, developers verify stable performance as features scale over time.
+
+Table 5.1: Unit Test Cases for Mantra
+
+
+
+Test Case ID
+
+Component
+
+Test Description
+
+Expected Result
+
+Status
+
+UT01
+
+Calendar UI
+
+Verify that adding a task visually displays a loading indicator
+
+UI renders loader and prevents duplicate submissions
+
+Pass
+
+UT02
+
+Profile Gami- fication
+
+Ensure active study time correctly accumulates and calculates XP
+
+Accurate calculation mapping strictly to the user’s progress
+
+Pass
+
+UT03
+
+Chat Visibility
+
+Validates access protocols for the chat modal attributes (aria-hidden states)
+
+Modal opens and resets reliably without JavaScript console errors
+
+Pass
+
+UT04
+
+File	Process- ing
+
+Ensure text inputs and extraction mechanics function reliably upon backend submission
+
+Code returns valid textual extraction strings into Note instances
+
+Pass
+
+UT05
+
+Analytics UI
+
+Check zero-values for Profile XP and study time correctly display ‘0‘ rather than appear null
+
+Visible rendering of the integer ‘0‘ instead of a broken graphic
+
+Pass
+
+
+
+
+
+Integration Testing
+
+Integration testing involves checking how various independent modules of Mantra harmonize and connect securely to form a pipeline. In particular, we evaluate how frontend inputs translate into backend operations safely.
+
+Test Case ID
+
+Component
+
+Test Description
+
+Expected Result
+
+Status
+
+IT01
+
+Notes & Files
+
+Verify	saving standard texts/doc- uments transforms accurately into the Smart Notes module via the folder dialog
+
+Text contents are injected into the PostgreSQL Note database relation- ally
+
+Pass
+
+IT02
+
+Chat & Collabora- tion
+
+Ensure that the Share Note modal integrates correctly with the active WebSocket in- stance payload
+
+The specific note links broadcast dy- namically to all on- line participants
+
+Pass
+
+IT03
+
+Gamification Tracking
+
+Check if daily ac- tivity interactions automatically trig- ger streak counters upon first login ping
+
+Streak value ac- curately reflects chronological par- ticipation dates
+
+Pass
+
+IT04
+
+UI Global Aesthet- ics
+
+Ensure branding properties (such as updating to ‘mantra.png‘) ren- der globally across the dashboard structure
+
+Consistent UI images displayed on the homepage without failing to resolve
+
+Pass
+
+Table 5.2: Integration Test Cases for Mantra
+
+
+
+
+
+System Testing
+
+System testing evaluates the entire Laravel application contextually as a whole environment, determining if the UI, MVC backend logic, and PostgreSQL queries effectively merge for a usable platform.
+
+
+
+Test Case ID
+
+Component
+
+Test Description
+
+Expected Result
+
+Status
+
+ST01
+
+System Launch
+
+Verify that Laravel serves the core landing routing successfully
+
+Homepage index successfully ren- ders
+
+Pass
+
+ST02
+
+Chat Mechanics
+
+Verify	real-time WebSockets operate securely behind user authentication gate- ways
+
+Guests are com- pletely locked out of reading secure message lines
+
+Pass
+
+ST03
+
+Module Connectivity
+
+Verify navigation con- nects effortlessly to cal- endars, active profiles, and note repositories
+
+Users freely swap widgets without data persistence concerns
+
+Pass
+
+ST04
+
+UI Theming
+
+Check integration of Light/Dark modes against UI colors
+
+Elements dynam- ically adapt
+
+Pass
+
+Table 5.3: System Test Cases for Mantra
+
+
+
+
+
+Performance Testing
+
+Performance testing ensures that Mantra remains stable and scalable during heavy execution times — notably handling WebSockets concurrently and extracting intense PDF file data dy- namically.
+
+
+
+Test Case ID
+
+Component
+
+Test Description
+
+Expected Result
+
+Status
+
+PT01
+
+File Handling Load
+
+Upload sequentially large PDF files measur- ing textual extraction duration
+
+Response under 4-6 seconds, pre- venting memory leaks
+
+Pass
+
+PT02
+
+WebSockets Stability
+
+Connect multiple per- sistent background lis- teners on the Chat UI concurrently
+
+Low latency mes- sages, automatic reconnections without crashing browser hooks
+
+Pass
+
+PT03
+
+Database Queries
+
+Monitor execution du- ration required to calcu- late lifetime total user XP formulas
+
+Response	exe- cutes	instantly
+
+via	optimized Eloquent/- PostgreSQL mechanisms
+
+Pass
+
+Table 5.4: Performance Test Cases for Mantra
+
+
+
+
+
+DEPLOYMENT
+
+
+
+Folder Structure
+
+A clear and organized directory structure is essential for scaling and maintaining the Laravel application. Mantra’s codebase strictly follows the standard Laravel directory scaffolding, en- suring that controllers, models, views, and public assets are completely decoupled.
+
+
+
+
+
+
+
+
+
+Key Directories
+
+app/Http/Controllers: Contains all the business logic, including ChatController, NoteController, SmartNoteController, QuizController, EventController, TodoController, and the ProgressController managing XP and streaks.
+
+resources/views: Houses all the Blade templates used to construct the frontend UI, in- cluding the Master layouts, Calendar partials, and Chat modals.
+
+routes/web.php: Organizes all the web entry points connecting user requests to the ap- propriate backend Controllers.
+
+public/images: The repository for static assets, including mantra.png and achieve- ment iconography like trophies and medals.
+
+storage/app/public: Safely stores all user-uploaded documents (PDFs, DOCX files) be- fore they are processed by the Smart Notes extraction tools.
+
+
+
+
+
+GIT HISTORY
+
+
+
+To ensure proper version management, seamless collaboration, and reliable distribution, the entire codebase for Mantra is actively maintained using Git version control. This allows for the efficient tracking of iterations—from early calendar implementations to the later addition of the real-time Chat modules and Smart Note extraction engines.
+
+By pushing updates frequently to GitHub, the development cycle becomes robust against data loss, making it easy to roll back specific feature branches if a particular bug or UI breakage is introduced. The repository serves as a centralized location for storing the web application’s progress, guaranteeing that the most stable iteration of the platform is always accessible for final production deployment.
+
+
+
+
+
+Figure 7.1: Repository Build History 
+
+
+
+
+
+
+
+CONCLUSIONS
+
+
+
+Mantra has successfully achieved its objective of reimagining the traditional digital learning en- vironment by tightly integrating essential productivity tools with engaging, gamified elements. Unlike disconnected applications where students must switch between a calendar app, a note repository, and an instant messenger, Mantra consolidates these workflows into a cohesive, centralized dashboard built on a robust Laravel foundation.
+
+The incorporation of the Experience Points (XP) reward system, tracking daily study streaks, and visual achievements directly combat the lack of motivation frequently observed in modern remote learning. Concurrently, the Smart Notes module reduces the friction of transcribing or securely storing lecture materials, while the WebSocket-driven Chat interface promotes seam- less peer collaboration. By prioritizing an intuitive user interface utilizing HTML5/CSS3 and smooth, secure backend processes via PHP and Laravel, Mantra delivers a modern, highly effective educational companion that inspires continuous academic growth.
+
+
+
+FUTURE WORKS
+
+
+
+While Mantra currently offers a robust suite of tools for student productivity and collaboration, several future enhancements are planned to expand the platform’s capabilities:
+
+AI-Powered Note Summarization: Integrating Large Language Models (LLMs) to au- tomatically generate concise summaries or flashcards from the text extracted via the Smart Notes document parser.
+
+Group Collaboration Channels: Expanding the 1-on-1 WebSocket chat functionality into dedicated group channels, allowing entire study groups or project teams to commu- nicate and share notes collectively.
+
+Advanced Analytics Dashboard: Providing users with deeper insights into their pro- ductivity trends over time, such as charting optimal study hours or highlighting subjects that require more focus.
+
+Mobile Application Integration: Developing a companion iOS/Android mobile appli- cation to ensure students can manage calendars, track streaks, and chat seamlessly away from their desktop environments.
+
+Customizable Themes: Allowing users to fully personalize their dashboard themes and layouts beyond the standard light/dark modes to further enhance the customized user experience.
+
+
+
+
+
+
+
+
+
+APPENDIX
+
+
+
+Minimum Software Requirements
+
+
+
+Operating System: Windows 10/11, macOS, or modern Linux distributions.
+
+
+
+Web Browser: Latest versions of Google Chrome, Mozilla Firefox, Apple Safari, or Microsoft Edge.
+
+
+
+Local Development:
+
+PHP 8.1 or higher
+
+Composer (PHP Dependency Manager)
+
+PostgreSQL Server 14.0 or higher
+
+Node.js (for compiling frontend assets)
+
+
+
+Minimum Hardware Requirements
+
+Processor: Modern multi-core processor (Intel Core i3/AMD Ryzen 3 or higher) for rendering complex DOM elements and executing Laravel background jobs smoothly.
+
+
+
+RAM: 4 GB (8 GB recommended for heavy WebSocket usage and parsing large PDF doc- uments locally).
+
+
+
+Storage: Minimum 10 GB of free space for database storage, caching, and hosting uploaded user document files.
+
+
+
+Display: A screen resolution of 1280x720 or higher is recommended for the responsive UI to display the Calendar, Chat, and Gamification sections optimally.
+
+
+
+Network Connectivity: A stable internet connection is required to communicate with real- time WebSocket broadcasting servers.
+
+
+
+
+

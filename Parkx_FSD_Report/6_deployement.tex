@@ -1,0 +1,14 @@
+\chapter{DEPLOYMENT}
+
+Deployment involves hosting the ParkX application logic, database, and frontend assets in an accessible environment. For development and proof-of-concept testing, the application operates on a local sandbox.
+
+\section{Local Deployment Strategy}
+The ParkX system utilizes a robust local development pipeline mirroring production scenarios.
+\begin{enumerate}
+    \item \textbf{Environment Initialization:} The \texttt{.env} configuration establishes secure parameters for database connections (MySQL on port 3306), application keys, and caching drivers.
+    \item \textbf{Database Seeding:} Laravel's native migration system (\texttt{php artisan migrate:fresh --seed}) dynamically instantiates the normalized table schema and populates test records for Users, Categories, and Roles.
+    \item \textbf{Asset Compilation:} Vite bundles the Tailwind CSS directives and Alpine.js modules via the \texttt{npm run build} command, ensuring static assets are minified and cached.
+    \item \textbf{Server Execution:} The Artisan CLI (\texttt{php artisan serve}) boots a local PHP development server running actively on \texttt{localhost:8000}.
+\end{enumerate}
+
+Future production deployment entails scaling to cloud infrastructure such as AWS EC2 or DigitalOcean droplets, securing SSL certificates via Let's Encrypt for HTTPS data encryption, and shifting to an enterprise-tier PostgreSQL or managed RDS instance.

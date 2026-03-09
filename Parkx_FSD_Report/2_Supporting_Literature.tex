@@ -1,0 +1,18 @@
+\chapter{SUPPORTING LITERATURE}
+
+\section{Existing Systems}
+Traditionally, parking management relied on manual ticketing, cash-based payments, and physical guards directing vehicles to vacant slots. These systems presented numerous flaws:
+\begin{itemize}
+    \item \textbf{High Wait Times:} Manual ticket generation slows down entry processes during peak hours, causing long queues on major roads.
+    \item \textbf{Lack of Real-time Data:} Drivers circle blocks aimlessly because there is no prior knowledge of slot availability.
+    \item \textbf{Revenue Leakages:} Manual accounting significantly increases the chance of unrecorded transactions or human error, penalizing the property owner.
+    \item \textbf{Suboptimal Utilization:} Large properties often have segmented lots where distant slots remain empty simply because drivers are unaware of them.
+\end{itemize}
+
+\section{Transition to Smart Solutions}
+Recent years have seen the implementation of semi-automated models, primarily using RFID cards or boom barriers. However, these systems often lack a user-facing booking interface that allows discovery *prior* to arrival. Mobile applications exist, but they are often highly fragmented, requiring drivers to download different apps for different parking providers.
+
+\section{The ParkX Approach}
+ParkX improves upon the current literature and existing deployments by acting as an aggregator. Rather than belonging to a single parking complex, ParkX operates as a multi-tenant platform. Property owners register their venues on the platform, and the Super Admin vets and approves them. Once approved, all users on the ParkX network can discover and book slots at those venues. 
+
+This approach minimizes fragmentation, centralizes the software architecture, and applies a modern tech stack (Laravel 12, Tailwind CSS \cite{tailwindcss}, Alpine.js \cite{alpinejs}) to ensure the platform feels fast, secure \cite{laravel_docs}, and responsive across all devices.

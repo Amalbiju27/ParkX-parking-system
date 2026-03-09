@@ -1,0 +1,242 @@
+\chapter{SYSTEM DESIGN }
+
+\section{Project Design}
+System design involves planning the structure, components, data flows, and interfaces of an application to fulfill a set of specific requirements organically. Strong system design ensures the product has room to grow, avoids architectural bottlenecks, and delivers a robust, responsive feedback loop to the driver, owner, or system admin.
+
+In ParkX, the system architecture operates via an MVC structure specifically customized to favor transaction integrity holding exact parking times.
+
+\subsection{User Interface (UI) Design}
+The UI Aesthetics of ParkX strictly follow an "Antigravity" design blueprint. This relies on semi-transparent glassmorphic overlays, vibrant floating elements, and sharp border-radius implementations. Unlike standard dashboard panels, the interface encourages visually appealing micro-interactions to signify digital modernity.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{home.png}
+    \caption{Landing Page - Modern UI Design}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{login.png}
+    \caption{Authentication Portal (Login / Registration Glass Form)}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{admin_dashboard.png}
+    \caption{Super Admin Analytics Dashboard}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{owner_dashboard.png}
+    \caption{Owner Hub \& Statistics}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{owner_slots.png}
+    \caption{Owner Slot Management Panel}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{user_dashboard.png}
+    \caption{User Personal Dashboard \& History}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{user_booking.png}
+    \caption{User Booking Form with Architectural Map Grid}
+\end{figure}
+
+\subsection{System Architecture Diagram}
+The System Architecture diagram maps the communication pathways between the frontend client, the backend Laravel framework, and the PostgreSQL database layer locking mechanisms.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{architecture.png}
+    \caption{ParkX System Architecture}
+\end{figure}
+
+\subsection{Database Design}
+The ParkX database leverages normalized relational models using PostgreSQL. Crucial tables include:
+
+\subsubsection{Core Application Tables}
+
+\paragraph{Table: \texttt{users}}
+Stores authentication and role credentials for the system.
+\begin{longtable}{|p{3cm}|p{3cm}|p{2cm}|p{6cm}|}
+    \hline
+    \textbf{Column Name} & \textbf{Data Type} & \textbf{Key} & \textbf{Description} \\
+    \hline
+    \endhead
+    id & BigInt & PK & Unique identifier for the user \\
+    \hline
+    name & Varchar(255) & - & Full name of the user \\
+    \hline
+    email & Varchar(255) & Unique & Login email address \\
+    \hline
+    role & Enum & - & Defined as 'student', 'admin', or 'owner' \\
+    \hline
+    password & Varchar(255) & - & Hash of the user's password \\
+    \hline
+\end{longtable}
+
+\paragraph{Table: \texttt{vehicle\_categories}}
+Defines universally available vehicle types and pricing matrices.
+\begin{longtable}{|p{3cm}|p{3cm}|p{2cm}|p{6cm}|}
+    \hline
+    \textbf{Column Name} & \textbf{Data Type} & \textbf{Key} & \textbf{Description} \\
+    \hline
+    \endhead
+    id & BigInt & PK & Unique identifier for the category \\
+    \hline
+    name & Varchar(255) & - & E.g., 'Two Wheeler', 'Four Wheeler' \\
+    \hline
+    base\_charge & Decimal(8,2) & - & The flat entry fee for this vehicle type \\
+    \hline
+    hourly\_rate & Decimal(8,2) & - & The recurring hourly cost \\
+    \hline
+\end{longtable}
+
+\subsubsection{Physical Infrastructure Tables}
+
+\paragraph{Table: \texttt{parking\_spaces}}
+Represents a physical parking venue or lot managed by an owner.
+\begin{longtable}{|p{3cm}|p{3cm}|p{2cm}|p{6cm}|}
+    \hline
+    \textbf{Column Name} & \textbf{Data Type} & \textbf{Key} & \textbf{Description} \\
+    \hline
+    \endhead
+    id & BigInt & PK & Unique identifier for the parking space \\
+    \hline
+    owner\_id & BigInt & FK & Links to \texttt{users} table (Role: Owner) \\
+    \hline
+    name & Varchar(255) & - & Name of the parking venue \\
+    \hline
+    location\_address & Text & - & Physical address of the venue \\
+    \hline
+\end{longtable}
+
+\paragraph{Table: \texttt{parking\_space\_owners}}
+Stores the extended profile details of approved space owners.
+\begin{longtable}{|p{3cm}|p{3cm}|p{2cm}|p{6cm}|}
+    \hline
+    \textbf{Column Name} & \textbf{Data Type} & \textbf{Key} & \textbf{Description} \\
+    \hline
+    \endhead
+    id & BigInt & PK & Unique identifier for the owner profile \\
+    \hline
+    user\_id & BigInt & FK & Links to \texttt{users} table (Role: Owner) \\
+    \hline
+    contact & Varchar(255) & - & Contact phone number \\
+    \hline
+    address & Varchar(255) & - & Personal residential or office address \\
+    \hline
+    status & Enum & - & Defined as 'active' or 'inactive' \\
+    \hline
+\end{longtable}
+
+\paragraph{Table: \texttt{parking\_slots}}
+Represents a distinct individual parking slot within a broader parking space.
+\begin{longtable}{|p{3cm}|p{3cm}|p{2cm}|p{6cm}|}
+    \hline
+    \textbf{Column Name} & \textbf{Data Type} & \textbf{Key} & \textbf{Description} \\
+    \hline
+    \endhead
+    id & BigInt & PK & Unique identifier for the slot \\
+    \hline
+    space\_id & BigInt & FK & Links to \texttt{parking\_spaces} table \\
+    \hline
+    category\_id & BigInt & FK & Links to \texttt{vehicle\_categories} table \\
+    \hline
+    slot\_identifier & Varchar(50) & - & E.g., 'A1', 'B4' \\
+    \hline
+    is\_active & Boolean & - & Determines if the slot is currently bookable \\
+    \hline
+\end{longtable}
+
+\subsubsection{Transaction \& Presence Tables}
+
+\paragraph{Table: \texttt{vehicles}}
+Tracks the physical presence and financial metrics of cars currently inside the venue.
+\begin{longtable}{|p{3cm}|p{3cm}|p{2cm}|p{6cm}|}
+    \hline
+    \textbf{Column Name} & \textbf{Data Type} & \textbf{Key} & \textbf{Description} \\
+    \hline
+    \endhead
+    id & BigInt & PK & Unique identifier for the vehicle record \\
+    \hline
+    parking\_space\_id & BigInt & FK & Links to \texttt{parking\_spaces} table \\
+    \hline
+    category\_id & BigInt & FK & Links to \texttt{vehicle\_categories} table \\
+    \hline
+    user\_id & BigInt & FK & Links to \texttt{users} table (Nullable) \\
+    \hline
+    vehicle\_number & Varchar(255) & - & The license plate number \\
+    \hline
+    entry\_time & Timestamp & - & Time the vehicle entered the venue \\
+    \hline
+    exit\_time & Timestamp & - & Time the vehicle exited (Nullable) \\
+    \hline
+    duration & Integer & - & Total parked duration in minutes \\
+    \hline
+    charge & Decimal(10,2) & - & Calculated base cost \\
+    \hline
+    penalty & Decimal(10,2) & - & Late exit penalties \\
+    \hline
+    status & Enum & - & Defined as 'parked' or 'exited' \\
+    \hline
+\end{longtable}
+
+\paragraph{Table: \texttt{bookings}}
+Connects a User to a specific Slot for a specific time and records transactional data.
+\begin{longtable}{|p{3cm}|p{3cm}|p{2cm}|p{6cm}|}
+    \hline
+    \textbf{Column Name} & \textbf{Data Type} & \textbf{Key} & \textbf{Description} \\
+    \hline
+    \endhead
+    id & BigInt & PK & Unique identifier for the booking \\
+    \hline
+    user\_id & BigInt & FK & Links to \texttt{users} table (Consumer) \\
+    \hline
+    slot\_id & BigInt & FK & Links to \texttt{parking\_slots} table \\
+    \hline
+    reservation\_time & Timestamp & - & Exact time range of the booking slot \\
+    \hline
+    status & Enum & - & E.g., 'Pending', 'Confirmed', 'Completed' \\
+    \hline
+    vehicle\_video & Varchar(255) & - & Path to 10MB condition proof video upload \\
+    \hline
+\end{longtable}
+
+\subsection{Class Diagram}
+The Class Diagram illustrates the object-oriented structure of the ParkX application, detailing the core entities, their attributes, methods, and relationships.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{class_diagram.png}
+    \caption{Class Diagram - ParkX Core Entities}
+\end{figure}
+
+\subsection{Entity-Relationship (ER) Diagram}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{er_diagram.png}
+    \caption{Entity-Relationship (ER) Diagram - ParkX Database using PostgreSQL}
+\end{figure}
+
+\subsection{Sequence Diagram}
+The sequence diagram demonstrates the flow of actions occurring behind the scenes when a user requests an exact-time parking reservation, leveraging an explicit \texttt{FOR UPDATE} database lock to guarantee atomic conflict resolution.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{sequence.png}
+    \caption{Database Sequence Diagram - Booking Locking Flow}
+\end{figure}
+
+\section{Project Pipeline}
+The project pipeline outlines the sequential lifecycle of ParkX's development, bridging initial requirements to final deployment.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{pipeline.png}
+    \caption{Project Pipeline Flowchart}
+\end{figure}
