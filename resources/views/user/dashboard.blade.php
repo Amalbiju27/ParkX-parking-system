@@ -3,7 +3,7 @@
 @section('title', 'User Dashboard')
 
 @section('content')
-<div class="w-100 min-vh-100 py-5 w-full min-h-screen" style="background-image: url('{{ asset('images/dashboard-bg.jpg') }}'); background-size: cover; background-position: center center; background-attachment: fixed;">
+<div class="w-full min-h-screen py-5" style="background-image: url('{{ asset('images/dashboard-bg.jpg') }}'); background-size: cover; background-position: center; background-attachment: fixed;">
     <div class="container p-4 p-md-5 mx-auto max-w-7xl shadow-lg" style="background-color: rgba(255, 255, 255, 0.92); backdrop-filter: blur(15px); border: 1px solid rgba(0,0,0,0.1); border-radius: 0;">
         <!-- Header -->
         <div class="card-minimal border border-dark rounded-0 p-8 lg:p-12 mb-8 animate-slide-up bg-white">

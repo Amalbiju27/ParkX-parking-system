@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -252,10 +253,24 @@ class DashboardController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Booking is already ' . $booking->status . '.']);
         }
 
+        if (now()->lessThan(Carbon::parse($booking->start_time)->subMinutes(15))) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Too early! This ticket is valid from ' . Carbon::parse($booking->start_time)->format('h:i A on d M Y')
+            ]);
+        }
+
+        if (now()->greaterThan(Carbon::parse($booking->end_time))) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'This ticket has already expired.'
+            ]);
+        }
+
         if ($booking->scanned_at !== null) {
             return response()->json([
                 'status' => 'error', 
-                'message' => 'Already scanned at ' . \Carbon\Carbon::parse($booking->scanned_at)->format('h:i A'), 
+                'message' => 'Already scanned at ' . Carbon::parse($booking->scanned_at)->format('h:i A'), 
                 'payment_status' => $booking->payment_status
             ]);
         }
@@ -291,8 +306,16 @@ class DashboardController extends Controller
             return back()->with('error', 'Booking is already ' . $booking->status . '.');
         }
 
+        if (now()->lessThan(Carbon::parse($booking->start_time)->subMinutes(15))) {
+            return back()->with('error', 'Too early! This ticket is valid from ' . Carbon::parse($booking->start_time)->format('h:i A on d M Y'));
+        }
+
+        if (now()->greaterThan(Carbon::parse($booking->end_time))) {
+            return back()->with('error', 'This ticket has already expired.');
+        }
+
         if ($booking->scanned_at !== null) {
-            return back()->with('error', 'Already scanned at ' . \Carbon\Carbon::parse($booking->scanned_at)->format('h:i A'));
+            return back()->with('error', 'Already scanned at ' . Carbon::parse($booking->scanned_at)->format('h:i A'));
         }
 
         DB::table('bookings')->where('id', $id)->update([

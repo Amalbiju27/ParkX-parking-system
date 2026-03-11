@@ -175,6 +175,13 @@
         }
         
         $recordId = $activeRecord ? $activeRecord->id : null;
+        
+        $endTime = null;
+        if ($recordType === 'booking' && isset($activeRecord->end_time)) {
+            $endTime = $activeRecord->end_time;
+        } elseif ($recordType === 'manual' && isset($activeRecord->expected_exit_time)) {
+            $endTime = $activeRecord->expected_exit_time;
+        }
     @endphp
     
     <div class="card bg-black text-white rounded-none border-0 shadow-sm mt-3" style="width: 250px; border-left: 4px solid #ef4444 !important;">
@@ -195,10 +202,20 @@
                     <span class="text-[10px] text-gray-500 uppercase tracking-widest">REG NO:</span>
                     <span class="font-bold text-sm font-mono tracking-wider">{{ $vehicleNo }}</span>
                 </div>
-                <div class="flex justify-between items-center">
+                <div class="flex justify-between items-center mb-1">
                     <span class="text-[10px] text-gray-500 uppercase tracking-widest">ENTRY:</span>
                     <span class="font-bold text-green-500 text-sm font-mono">{{ $entryTime }}</span>
                 </div>
+                @if($endTime)
+                <div class="flex justify-between items-center mb-1">
+                    <span class="text-[10px] text-gray-500 uppercase tracking-widest">EXIT:</span>
+                    <span class="font-bold text-gray-400 text-sm font-mono">{{ \Carbon\Carbon::parse($endTime)->format('h:i A') }}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] text-gray-500 uppercase tracking-widest">TIME LEFT:</span>
+                    <span class="text-sm font-mono countdown-timer" data-end-time="{{ \Carbon\Carbon::parse($endTime)->toIso8601String() }}">Computing...</span>
+                </div>
+                @endif
             </div>
             
             @if($videoPath)
@@ -507,5 +524,41 @@
             // keep scanning silently
         }
     });
+
+    // Countdown Timer Logic
+    setInterval(function() {
+        const timers = document.querySelectorAll('.countdown-timer');
+        const now = new Date().getTime();
+
+        timers.forEach(timer => {
+            const endTimeStr = timer.getAttribute('data-end-time');
+            if (!endTimeStr) return;
+
+            const endTime = new Date(endTimeStr).getTime();
+            const distance = endTime - now;
+
+            if (distance < 0) {
+                timer.innerHTML = "EXPIRED";
+                timer.className = "text-sm font-mono countdown-timer text-red-500 font-bold animate-pulse";
+            } else {
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                const formattedTime =
+                    String(hours).padStart(2, '0') + "h " +
+                    String(minutes).padStart(2, '0') + "m " +
+                    String(seconds).padStart(2, '0') + "s";
+
+                timer.innerHTML = formattedTime;
+
+                if (distance < 15 * 60 * 1000) {
+                    timer.className = "text-sm font-mono countdown-timer text-orange-400 font-bold";
+                } else {
+                    timer.className = "text-sm font-mono countdown-timer text-green-400 font-bold";
+                }
+            }
+        });
+    }, 1000);
 </script>
 @endsection

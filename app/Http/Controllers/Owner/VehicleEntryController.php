@@ -56,7 +56,9 @@ return view('owner.vehicle_entry.create', compact('parkingSpaces', 'categories')
             'category_id'      => 'required|exists:vehicle_categories,id',
             'vehicle_number'   => 'required|string|max:20',
             'slot_id'          => 'required|exists:parking_slots,id',
-            'duration'         => 'required|integer|min:1' // Validate duration
+            'start_time'       => 'required|date',
+            'end_time'         => 'required|date|after:start_time',
+            'total_amount'     => 'required|numeric|min:0',
         ]);
 
         DB::beginTransaction();
@@ -70,9 +72,8 @@ return view('owner.vehicle_entry.create', compact('parkingSpaces', 'categories')
             }
 
             // Calculate Expected Exit Time
-            $entryTime = now();
-           // Add (int) before $request->duration
-$expectedExitTime = $entryTime->copy()->addHours((int) $request->duration); 
+            $entryTime = \Carbon\Carbon::parse($request->start_time);
+            $expectedExitTime = \Carbon\Carbon::parse($request->end_time); 
 
             // Insert Vehicle Record
             DB::table('vehicles')->insert([
@@ -82,6 +83,7 @@ $expectedExitTime = $entryTime->copy()->addHours((int) $request->duration);
                 'vehicle_number'      => strtoupper($request->vehicle_number),
                 'entry_time'          => $entryTime,
                 'expected_exit_time'  => $expectedExitTime, // Save calculated time
+                'charge'              => $request->total_amount, // DB column for the amount
                 'status'              => 'parked',
                 'created_at'          => now(),
                 'updated_at'          => now(),
