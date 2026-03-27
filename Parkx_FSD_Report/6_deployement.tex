@@ -1,14 +1,16 @@
 \chapter{DEPLOYMENT}
+The deployment phase describes the environment and procedures required to make the ParkX application operational. The system is designed for high performance on modern web servers with a focus on ease of setup and maintenance.
 
-Deployment involves hosting the ParkX application logic, database, and frontend assets in an accessible environment. For development and proof-of-concept testing, the application operates on a local sandbox.
+\section{Deployment Strategy}
+The ParkX system utilizes a robust local development pipeline that can be seamlessly transitioned to production cloud environments.
 
-\section{Local Deployment Strategy}
-The ParkX system utilizes a robust local development pipeline mirroring production scenarios.
 \begin{enumerate}
-    \item \textbf{Environment Initialization:} The \texttt{.env} configuration establishes secure parameters for database connections (MySQL on port 3306), application keys, and caching drivers.
-    \item \textbf{Database Seeding:} Laravel's native migration system (\texttt{php artisan migrate:fresh --seed}) dynamically instantiates the normalized table schema and populates test records for Users, Categories, and Roles.
-    \item \textbf{Asset Compilation:} Vite bundles the Tailwind CSS directives and Alpine.js modules via the \texttt{npm run build} command, ensuring static assets are minified and cached.
-    \item \textbf{Server Execution:} The Artisan CLI (\texttt{php artisan serve}) boots a local PHP development server running actively on \texttt{localhost:8000}.
+    \item \textbf{Environment Configuration:} The \textbf{.env} configuration establishes secure parameters for PostgreSQL database connections, application encryption keys, and session management.
+    \item \textbf{Dependency Management:} Backend packages are managed via \textbf{Composer}, ensuring all Laravel core components and third-party libraries are up to date and securely installed.
+    \item \textbf{Database Lifecycle:} Laravel's native migration system (\textbf{php artisan migrate}) is used to instantiate the normalized PostgreSQL schema, ensuring consistent data structures across development and production environments.
+    \item \textbf{Asset Delivery:} To optimize performance and reduce local dependencies, \textbf{Tailwind CSS} is delivered via a high-performance Content Delivery Network (CDN), removing the need for local Node.js compilation during deployment.
+    \item \textbf{Process Execution:} The system utilizes the \textbf{php artisan serve} command for development testing, while production environments leverage Nginx or Apache with PHP-FPM for high-concurrency request handling.
 \end{enumerate}
 
-Future production deployment entails scaling to cloud infrastructure such as AWS EC2 or DigitalOcean droplets, securing SSL certificates via Let's Encrypt for HTTPS data encryption, and shifting to an enterprise-tier PostgreSQL or managed RDS instance.
+\section{Conclusion on Deployment}
+Future production scaling includes hosting on cloud platforms such as DigitalOcean or AWS, implementing SSL certificates for HTTPS encryption, and utilizing managed PostgreSQL instances for high availability and automated backups.

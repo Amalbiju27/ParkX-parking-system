@@ -37,12 +37,14 @@
 
 \begin{document}
 
+\pagenumbering{roman}
 \include{coverpage}
 \newpage
 \include{certificate}
 \newpage
 \setstretch{1.15} 
-\pagenumbering{roman}
+
+\setcounter{page}{1} % Set acknowledgement to roman i
 \include{acknowledgement}
 \newpage
 \include{abstract}
@@ -51,18 +53,36 @@
 \renewcommand{\baselinestretch}{1.15}  
 \selectfont  
 
+\renewcommand{\contentsname}{\hfill \LARGE \textbf{CONTENTS} \hfill} 
+\tableofcontents
+\newpage
+
 \addcontentsline{toc}{chapter}{LIST OF TABLES} 
 \renewcommand{\listtablename}{\hfill \LARGE \textbf{LIST OF TABLES} \hfill} 
 \listoftables
 \newpage
 
 \addcontentsline{toc}{chapter}{LIST OF FIGURES} 
-\renewcommand{\listfigurename}{\hfill \LARGE \textbf{LIST OF FIGURES} \hfill} 
-\listoffigures
-\newpage
+\begin{center}
+    \LARGE \textbf{LIST OF FIGURES}
+\end{center}
 
-\renewcommand{\contentsname}{\hfill \LARGE \textbf{CONTENTS} \hfill} 
-\tableofcontents
+\vspace{0.5cm}
+
+\noindent
+\begin{longtable}{p{2cm} p{10cm} r}
+    \textbf{Figure No.} & \textbf{Title} & \textbf{Page No.} \\
+    \hline
+    \endhead
+    Figure 4.1 & Use Case Diagram \dotfill & \pageref{fig:use_case} \\
+    Figure 4.2 & Activity Diagram (User Booking Flow) \dotfill & \pageref{fig:activity} \\
+    Figure 4.3 & System Architecture Diagram \dotfill & \pageref{fig:architecture} \\
+    Figure 4.4 & Class Diagram \dotfill & \pageref{fig:class} \\
+    Figure 4.5 & Entity-Relationship (ER) Diagram \dotfill & \pageref{fig:er} \\
+    Figure 4.6 & Sequence Diagram (Transactional Slot Locking) \dotfill & \pageref{fig:sequence} \\
+    Figure 4.7 & Project Pipeline \dotfill & \pageref{fig:pipeline} \\
+    Figure 7.1 & Git Commit History \dotfill & \pageref{fig:git} \\
+\end{longtable}
 
 \newpage
 \pagestyle{fancy}
@@ -94,11 +114,12 @@
 \include{4_System_Design}
 \include{5_testing}
 \include{6_deployement}
+\include{7_Git_History}
 \include{8_Conclusion}
 \include{9_Future_works}
 \include{10_Appendix}
 
-\renewcommand{\bibname}{11 REFERENCES } 
-\addcontentsline{toc}{chapter}{11 REFERENCES }  
+\renewcommand{\bibname}{10 REFERENCES } 
+\addcontentsline{toc}{chapter}{10 REFERENCES }  
 
 \end{document}

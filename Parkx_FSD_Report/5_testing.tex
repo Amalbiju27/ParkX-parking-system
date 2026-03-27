@@ -1,80 +1,76 @@
 \chapter{TESTING}
-Testing is a fundamental pillar of software reliability. In the context of the ParkX Smart Parking Management System, a wide array of test metrics were applied to ensure transactional safety, responsive cross-browser rendering, and strict role segregation.
+Testing is a critical phase in the software development lifecycle, ensuring that the application meets all technical and functional requirements. For ParkX, testing was focused on transactional safety, role-based access security, and the reliability of the manual fallback systems.
 
 \section{Unit Testing}
-Unit testing ensures that individual database models, controllers, and validation rules operate correctly independent of the broader application structure.
+Unit testing ensures that individual logic blocks and validation rules operate correctly in isolation.
 
-\begin{longtable}{|p{1.5cm}|p{2.5cm}|p{4cm}|p{4cm}|c|}
+\begin{longtable}{|p{1.5cm}|p{3cm}|p{4.5cm}|p{4.5cm}|c|}
+    \caption{Unit Test Cases} \label{tab:unit_tests} \\
     \hline
-    \textbf{Test ID} & \textbf{Component} & \textbf{Test Description} & \textbf{Expected Result} & \textbf{Status} \\
+    \textbf{ID} & \textbf{Component} & \textbf{Test Description} & \textbf{Expected Result} & \textbf{Status} \\
     \hline
     \endfirsthead
     \hline
-    \textbf{Test ID} & \textbf{Component} & \textbf{Test Description} & \textbf{Expected Result} & \textbf{Status} \\
+    \textbf{ID} & \textbf{Component} & \textbf{Test Description} & \textbf{Expected Result} & \textbf{Status} \\
     \hline
     \endhead
+    UT01 & Auth Logic & Verify login with bcrypt hashed passwords. & Valid users login; failed passwords reject. & Pass \\
     \hline
-    \endfoot
+    UT02 & RBAC & Access Owner dashboard as a standard User. & System redirects to unauthorized error page. & Pass \\
     \hline
-    \caption{Unit Test Cases for ParkX} \label{tab:unit_tests} \\
-    \endlastfoot
-
-    UT01 & Login Logic & \raggedright Verify user authentication against bcrypt hashes & \raggedright Authentic users login; false passwords reject & Pass \\
+    UT03 & PIN Generation & Generate 6-char alphanumeric PIN on booking. & PIN is unique, uppercase, and 6 chars long. & Pass \\
     \hline
-    UT02 & Middleware & \raggedright Access Owner dashboard as an standard User & \raggedright System blocks access and redirects & Pass \\
+    UT04 & Date Validation & Attempt booking for an expired slot. & Validation prevents creation with an error. & Pass \\
     \hline
-    UT03 & Form Validation & \raggedright Submit booking form lacking a slot\_id selection & \raggedright Validation error prevents processing & Pass \\
-    \hline
-    UT04 & DB Creation & \raggedright Create slot via Owner controller & \raggedright Valid slot entry appears in DB via Eloquent & Pass \\
 \end{longtable}
 
 \section{Integration Testing}
-Integration testing verifies that the interaction between diverse modules performs effectively, such as checking if user bookings effectively reduce available slot capacity metrics.
+Integration testing verifies that the interaction between diverse modules performs effectively.
 
 \begin{table}[H]
     \centering
-    \renewcommand{\arraystretch}{1.3}
+    \caption{Integration Test Cases}
+    \label{tab:integration_tests}
+    \renewcommand{\arraystretch}{1.5}
     \small
-    \begin{tabular}{|c|p{3cm}|p{3cm}|p{3cm}|c|}
+    \begin{tabular}{|c|p{3.5cm}|p{4cm}|p{4cm}|c|}
         \hline
-        \textbf{Test ID} & \textbf{Component} & \textbf{Test Description} & \textbf{Expected Result} & \textbf{Status} \\
+        \textbf{ID} & \textbf{Component} & \textbf{Test Description} & \textbf{Expected Result} & \textbf{Status} \\
         \hline
-        IT01 & Booking \& Slots & Valid user books an available Owner slot & Slot status associates correctly, booking confirms & Pass \\
+        IT01 & Booking \& Slots & User reserves a slot via the visual grid. & Slot status becomes 'reserved' in DB. & Pass \\
         \hline
-        IT02 & Category Sync & Admin deletes a Vehicle Category & Associated cascading/warning logic triggers safely & Pass \\
+        IT02 & Manual Check-in & Owner enters a valid 6-char Ticket PIN. & Booking status updates to 'occupied'. & Pass \\
         \hline
-        IT03 & UI Rendering & Alpine.js dynamic category filtering & Relevant slots populate upon category selection without page reload & Pass \\
+        IT03 & Overlap Control & Simultaneous booking of the same slot. & PostgreSQL locks prevent double-booking. & Pass \\
         \hline
     \end{tabular}
-    \caption{Integration Test Cases for ParkX}
-    \label{tab:integration_tests}
 \end{table}
 
 \section{System Testing}
-System testing evaluates the deployed application as an entire closed system via a browser, simulating accurate user flows.
+System testing evaluates the application as a unified whole across different device scenarios.
 
 \begin{table}[H]
     \centering
-    \renewcommand{\arraystretch}{1.3}
-    \begin{tabular}{|c|c|p{4cm}|p{3cm}|c|}
+    \caption{System Test Cases}
+    \label{tab:system_tests}
+    \renewcommand{\arraystretch}{1.5}
+    \begin{tabular}{|c|c|p{4cm}|p{3.5cm}|c|}
         \hline
-        \textbf{Test ID} & \textbf{Component} & \textbf{Test Description} & \textbf{Expected Result} & \textbf{Status} \\
+        \textbf{ID} & \textbf{Component} & \textbf{Test Description} & \textbf{Expected Result} & \textbf{Status} \\
         \hline
-        ST01 & Full App Launch & Verify local execution via \texttt{php artisan serve} & Application loads on designated PORT & Pass \\
+        ST01 & App Launch & Verify local execution via \textbf{php artisan serve}. & Application loads on localhost:8000. & Pass \\
         \hline
-        ST02 & UI Responsiveness & Shrink screen to mimic mobile display & Tailwind CSS restructures grid to column layout & Pass \\
+        ST02 & Mobile UI & Test dashboard grid on small screen widths. & Tailwind CSS restructures layout for mobile. & Pass \\
         \hline
-        ST03 & Concurrency & Multiple users hit the booking endpoint simultaneously & InnoDB locks prevent double booking over shared slots & Pass \\
+        ST03 & Fallback Flow & Process arrival without a functional camera. & Owner uses manual PIN to verify entry. & Pass \\
         \hline
     \end{tabular}
-    \caption{System Test Cases for ParkX}
-    \label{tab:system_tests}
 \end{table}
 
-\section{Security \& Performance Testing}
-Performance and security testing validates that ParkX remains resilient against bad actors and resource exhaustion.
-
+\section{Security \& Performance Verification}
+Security testing ensures the platform remains resilient against unauthorized access and common web vulnerabilities.
 \begin{itemize}
-    \item \textbf{CSRF Tokens:} All forms include \texttt{@csrf} directives, verified successfully by intercepting POST requests and observing 419 Page Expired errors on missing tokens.
-    \item \textbf{Load Times:} Vite Hot-Module Replacement (HMR) combined with Laravel backend renders most view changes within 200ms latency locally.
+    \item \textbf{CSRF Protection:} Verified that all POST requests require a valid token; missing tokens trigger 419 errors.
+    \item \textbf{Query Optimization:} Use of Eloquent with PostgreSQL row-level locking ensures rapid, conflict-free database responses under load.
 \end{itemize}
+
