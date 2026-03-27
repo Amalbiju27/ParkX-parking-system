@@ -1,59 +1,174 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<div align="center">
+  <h1>ParkX</h1>
+  <p><b>City-Level Vehicle Parking Management System</b></p>
+
+  <p>
+    <img src="https://img.shields.io/badge/Laravel-FF2D20?style=flat-square&logo=laravel&logoColor=white" alt="Laravel" />
+    <img src="https://img.shields.io/badge/PostgreSQL-316192?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL" />
+    <img src="https://img.shields.io/badge/TailwindCSS-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
+    <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black" alt="JavaScript" />
+  </p>
+
+  <p>
+    A centralized web application designed to modernize urban parking infrastructure.<br />
+    Developed as a <b>BSc Computer Science project</b> at <b>Rajagiri College of Social Sciences</b>.
+  </p>
+</div>
+
+<hr />
+
+## Table of Contents
+
+* [Core Features](#core-features)
+* [Technology Stack](#technology-stack)
+* [Screenshots](#screenshots)
+* [Getting Started](#getting-started)
+
+<hr />
+
+## Core Features
+
+### Real-Time Parking Matrix
+
+A responsive live grid that mirrors the actual parking layout on the Owner Dashboard.
+Parking slots automatically update their status (Available / Occupied) when a QR ticket is scanned.
+
+### Concurrency Control
+
+Utilizes database transactions (`DB::transaction`) during the booking phase to eliminate race conditions and prevent double booking.
+
+### Live QR Ticket Scanning
+
+Features an integrated webcam scanner using `html5-qrcode`, allowing operators to instantly verify and check-in vehicles upon arrival.
+
+### Security Validation
+
+Mandates vehicle condition video uploads during booking, utilizing both client-side interception and server-side MIME validation.
+
+### Dynamic Time Extensions
+
+Users can extend parking duration through a secure mock checkout system.
+A 10-minute grace period is provided prior to the application of late fines.
+
+### Automated Slot Expiry
+
+Implements Laravel Task Scheduling to automatically free up slots if payment is not completed within 15 minutes of booking initiation.
+
+<hr />
+
+## Technology Stack
+
+| Category            | Technologies                                           |
+| :------------------ | :----------------------------------------------------- |
+| **Backend**         | Laravel 12 (PHP 8.2)                                   |
+| **Database**        | PostgreSQL                                             |
+| **Frontend**        | Blade Templates, HTML5, Tailwind CSS, JavaScript (ES6) |
+| **Integration**     | Simple-QRCode (Generator), HTML5-QRCode (Scanner)      |
+| **Version Control** | Git, GitHub                                            |
+
+<hr />
+
+## Screenshots
+
+*(Ensure your images are uploaded to the `screenshots` directory in your repository root)*
+
+### Owner Parking Matrix
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="screenshots/owner-dashboard.png" width="850" alt="Owner Dashboard Live Matrix">
 </p>
 
-## About Laravel
+### User Dashboard & QR Ticket
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+<p align="center">
+  <img src="screenshots/qr-ticket.png" width="850" alt="User Dashboard and Mobile QR Ticket">
+</p>
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Mock Payment Gateway
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+<p align="center">
+  <img src="screenshots/payment.png" width="850" alt="Secure Mock Payment Gateway">
+</p>
 
-## Learning Laravel
+<hr />
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## Getting Started
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Prerequisites
 
-## Laravel Sponsors
+Ensure the following tools are installed on your local environment:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+* PHP >= 8.2
+* Composer
+* PostgreSQL
+* Node.js & NPM
+* Git
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### Local Installation
 
-## Contributing
+#### 1. Clone the repository
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```
+git clone https://github.com/Amalbiju27/ParkX.git
+cd ParkX
+```
 
-## Code of Conduct
+#### 2. Install dependencies
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```
+composer install
+npm install
+npm run build
+```
 
-## Security Vulnerabilities
+#### 3. Configure environment
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```
+cp .env.example .env
+php artisan key:generate
+```
 
-## License
+Open `.env` and configure your PostgreSQL database credentials.
+Also set:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```
+APP_TIMEZONE=Asia/Kolkata
+```
+
+#### 4. Run database migrations
+
+```
+php artisan migrate --seed
+```
+
+#### 5. Link storage (for file uploads)
+
+```
+php artisan storage:link
+```
+
+#### 6. Start the development server
+
+```
+php artisan serve
+```
+
+Access the application at:
+
+```
+http://127.0.0.1:8000
+```
+
+#### 7. Run the background scheduler
+
+```
+php artisan schedule:work
+```
+
+<hr />
+
+<div align="center">
+<p>Developed by <b>Amal Biju</b></p>
+</div>
