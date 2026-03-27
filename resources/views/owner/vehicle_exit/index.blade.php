@@ -54,7 +54,7 @@
                                 </div>
                             </div>
                             <div class="flex-shrink-0">
-                                <form method="POST" action="{{ route('owner.vehicle.exit') }}" class="inline-block m-0">
+                                <form method="POST" action="{{ route('owner.vehicle.exit.process', ['id' => $v->id, 'type' => 'manual']) }}" class="inline-block m-0">
                                     @csrf
                                     <input type="hidden" name="vehicle_number" value="{{ $v->vehicle_number }}">
                                     

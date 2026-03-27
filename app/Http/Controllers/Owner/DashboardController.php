@@ -16,7 +16,7 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 1️⃣ Parking spaces with LIVE availability
+        | 1ï¸âƒ£ Parking spaces with LIVE availability
         |--------------------------------------------------------------------------
         */
         $parkingSpaces = DB::table('parking_spaces')
@@ -36,7 +36,7 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 2️⃣ Slot details + Tooltip Data (FIXED)
+        | 2ï¸âƒ£ Slot details + Tooltip Data (FIXED)
         |--------------------------------------------------------------------------
         | I removed 'vehicles.expected_exit_time' since your database doesn't have it.
         */
@@ -57,7 +57,7 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 3️⃣ Current parked vehicles
+        | 3ï¸âƒ£ Current parked vehicles
         |--------------------------------------------------------------------------
         */
         $currentVehicles = DB::table('vehicles')
@@ -77,7 +77,7 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 4️⃣ Vehicle history (search + filter)
+        | 4ï¸âƒ£ Vehicle history (search + filter)
         |--------------------------------------------------------------------------
         */
         $historyQuery = DB::table('vehicles')
@@ -115,7 +115,7 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 5️⃣ Revenue (Unified)
+        | 5ï¸âƒ£ Revenue (Unified)
         |--------------------------------------------------------------------------
         */
         $todayManualRevenue = DB::table('vehicles')
@@ -145,7 +145,7 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 6️⃣ Live Counts - Refined for "Physically Occupied"
+        | 6ï¸âƒ£ Live Counts - Refined for "Physically Occupied"
         |--------------------------------------------------------------------------
         */
         $totalCapacity = DB::table('parking_slots')
@@ -178,14 +178,14 @@ class DashboardController extends Controller
             $spaceBooked = DB::table('bookings')->where('parking_space_id', $space->id)->whereNotNull('scanned_at')->whereIn('status', ['booked', 'occupied', 'reserved'])->count();
             $space->occupied_slots = $spaceManual + $spaceBooked;
             
-            // If the math feels off because slots are marked "occupied" without scanned_at:
-            // This ensures the UI counts strictly what's here right now.
+            // FIX: Available = Capacity - Occupied
+            $space->available_slots_count = max(0, $space->capacity - $space->occupied_slots);
         }
 
 
         /*
         |--------------------------------------------------------------------------
-        | 7️⃣ Current & Upcoming Bookings Separation
+        | 7ï¸âƒ£ Current & Upcoming Bookings Separation
         |--------------------------------------------------------------------------
         */
         // All active bookings for these spaces
@@ -325,5 +325,96 @@ class DashboardController extends Controller
         ]);
 
         return back()->with('success', 'Vehicle manually checked in successfully!');
+    }
+
+    public function checkInManualByPin(Request $request)
+    {
+        $request->validate([
+            'ticket_number' => 'required|string|size:6',
+        ]);
+
+        $ownerId = Auth::id();
+        $spaceIds = DB::table('parking_spaces')->where('owner_id', $ownerId)->pluck('id')->toArray();
+
+        $booking = DB::table('bookings')
+            ->where('ticket_number', strtoupper($request->ticket_number))
+            ->whereIn('parking_space_id', $spaceIds)
+            ->first();
+
+        if (!$booking) {
+            return back()->with('error', 'Invalid Ticket PIN.');
+        }
+
+        if (in_array($booking->status, ['cancelled', 'completed'])) {
+            return back()->with('error', 'Booking is already ' . $booking->status . '.');
+        }
+
+        if (now()->lessThan(Carbon::parse($booking->start_time)->subMinutes(15))) {
+            return back()->with('error', 'Too early! This ticket is valid from ' . Carbon::parse($booking->start_time)->format('h:i A on d M Y'));
+        }
+
+        if (now()->greaterThan(Carbon::parse($booking->end_time))) {
+            return back()->with('error', 'This ticket has already expired.');
+        }
+
+        if ($booking->scanned_at !== null) {
+            return back()->with('error', 'Already scanned at ' . Carbon::parse($booking->scanned_at)->format('h:i A'));
+        }
+
+        DB::table('bookings')->where('id', $booking->id)->update([
+            'scanned_at' => now(),
+            'status' => 'occupied',
+            'updated_at' => now(),
+        ]);
+
+        return back()->with('success', 'Vehicle manually checked in successfully!');
+    }
+
+    /**
+     * Print Thermal Receipt (80mm)
+     */
+    public function printReceipt($type, $id)
+    {
+        $ownerId = Auth::id();
+        $spaceIds = DB::table('parking_spaces')->where('owner_id', $ownerId)->pluck('id')->toArray();
+
+        $data = null;
+        $title = "PARKX RECEIPT";
+
+        if ($type === 'manual') {
+            $data = DB::table('vehicles')
+                ->join('parking_spaces', 'vehicles.parking_space_id', '=', 'parking_spaces.id')
+                ->leftJoin('parking_slots', 'vehicles.slot_id', '=', 'parking_slots.id')
+                ->where('vehicles.id', $id)
+                ->whereIn('vehicles.parking_space_id', $spaceIds)
+                ->select(
+                    'vehicles.vehicle_number',
+                    'vehicles.charge as amount',
+                    'vehicles.entry_time as date',
+                    'parking_spaces.name as space_name',
+                    'parking_slots.slot_number'
+                )
+                ->first();
+        } else {
+            $data = DB::table('bookings')
+                ->join('parking_spaces', 'bookings.parking_space_id', '=', 'parking_spaces.id')
+                ->leftJoin('parking_slots', 'bookings.slot_id', '=', 'parking_slots.id')
+                ->where('bookings.id', $id)
+                ->whereIn('bookings.parking_space_id', $spaceIds)
+                ->select(
+                    'bookings.vehicle_number',
+                    'bookings.amount',
+                    'bookings.created_at as date', // or start_time
+                    'parking_spaces.name as space_name',
+                    'parking_slots.slot_number'
+                )
+                ->first();
+        }
+
+        if (!$data) {
+            abort(404, "Receipt not found or unauthorised.");
+        }
+
+        return view('owner.receipt.thermal', compact('data', 'type', 'id'));
     }
 }

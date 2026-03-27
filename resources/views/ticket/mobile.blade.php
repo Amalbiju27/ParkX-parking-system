@@ -82,6 +82,12 @@
                             <div class="slot-number">{{ $booking->slot_id }}</div>
                         </div>
 
+                        <!-- Manual PIN Fallback -->
+                        <div class="bg-light border rounded-3 p-3 text-center mb-4">
+                            <span class="text-muted small fw-bold tracking-widest uppercase d-block mb-1">TICKET PIN</span>
+                            <span class="h2 fw-bolder tracking-widest text-dark">{{ $booking->ticket_number ?? '--- ---' }}</span>
+                        </div>
+
                         <div class="row mb-4">
                             <div class="col-6">
                                 <p class="data-label">Vehicle</p>

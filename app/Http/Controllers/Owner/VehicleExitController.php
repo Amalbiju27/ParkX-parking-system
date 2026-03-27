@@ -8,8 +8,17 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
+use App\Services\PricingService;
+
 class VehicleExitController extends Controller
 {
+    protected $pricingService;
+
+    public function __construct(PricingService $pricingService)
+    {
+        $this->pricingService = $pricingService;
+    }
+
     // 1. Show the Exit Form with List of Parked Vehicles
     public function index()
     {
@@ -74,15 +83,10 @@ class VehicleExitController extends Controller
                 $expectedExit = Carbon::parse($record->expires_at ?? $record->created_at->addHours($record->duration_hours ?? 1));
                 $bookedHours = $record->duration_hours ?? 1;
 
-                $standardFee = max(($bookedHours * $hourlyRate), $baseCharge);
-                $penalty = 0;
+                $standardFee = $this->pricingService->calculateFee((int)$bookedHours, (float)$hourlyRate, (float)$baseCharge);
+                $penalty = $this->pricingService->calculatePenalty($expectedExit, $now, (float)$penaltyPerMinute);
                 
-                if ($now->greaterThan($expectedExit)) {
-                    $overdueMinutes = $expectedExit->diffInMinutes($now);
-                    $penalty = $overdueMinutes * $penaltyPerMinute;
-                }
-                
-                $totalCharge = $standardFee + $penalty;
+                $totalCharge = $this->pricingService->calculateTotalWithPenalty($standardFee, $penalty);
                 
                 DB::table('bookings')->where('id', $id)->update([
                     'status' => 'completed',
@@ -93,7 +97,7 @@ class VehicleExitController extends Controller
                 DB::table('parking_slots')->where('id', $record->slot_id)->update(['status' => 'available']);
                 
                 $message = $penalty > 0 
-                    ? "Checkout successful with Penalty! Overtime: {$overdueMinutes} mins. Total: ₹{$totalCharge}" 
+                    ? "Checkout successful with Penalty! Overtime: " . $expectedExit->diffInMinutes($now) . " mins. Total: ₹{$totalCharge}" 
                     : "Checkout successful. Total: ₹{$totalCharge}";
 
             } 
@@ -123,16 +127,10 @@ class VehicleExitController extends Controller
                     $bookedHours = max(1, $entryTime->diffInHours($expectedExit));
                 }
                 
-                $standardFee = max(($bookedHours * $hourlyRate), $baseCharge);
-                $penalty = 0;
-                $penaltyPerMinute = 2; 
-
-                if ($now->greaterThan($expectedExit)) {
-                    $overdueMinutes = $expectedExit->diffInMinutes($now);
-                    $penalty = $overdueMinutes * $penaltyPerMinute;
-                }
+                $standardFee = $this->pricingService->calculateFee((int)$bookedHours, (float)$hourlyRate, (float)$baseCharge);
+                $penalty = $this->pricingService->calculatePenalty($expectedExit, $now, (float)$penaltyPerMinute);
                 
-                $totalCharge = $standardFee + $penalty;
+                $totalCharge = $this->pricingService->calculateTotalWithPenalty($standardFee, $penalty);
                 
                 DB::table('vehicles')->where('id', $id)->update([
                     'exit_time' => $now,
@@ -146,7 +144,7 @@ class VehicleExitController extends Controller
                 DB::table('parking_spaces')->where('id', $vehicle->parking_space_id)->increment('available_slots');
 
                 $message = $penalty > 0 
-                    ? "Vehicle exited with PENALTY! Overtime: {$overdueMinutes} mins. Total Bill: ₹{$totalCharge}" 
+                    ? "Vehicle exited with PENALTY! Overtime: " . $expectedExit->diffInMinutes($now) . " mins. Total Bill: ₹{$totalCharge}" 
                     : "Vehicle exited successfully. Total Bill: ₹{$totalCharge}";
                     
             } else {

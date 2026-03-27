@@ -95,6 +95,10 @@ Route::middleware(['auth', 'role:owner'])->prefix('owner')->name('owner.')->grou
     // Check-In Booking via Camera Scanner & Manual Button
     Route::post('/booking/check-in/{id}', [OwnerDashboardController::class, 'checkIn'])->name('booking.check-in');
     Route::post('/booking/manual-check-in/{id}', [OwnerDashboardController::class, 'manualCheckIn'])->name('booking.manual-check-in');
+    Route::post('/booking/check-in-manual', [OwnerDashboardController::class, 'checkInManualByPin'])->name('checkin.manual');
+
+    // Print Receipt
+    Route::get('/print-receipt/{type}/{id}', [OwnerDashboardController::class, 'printReceipt'])->name('print.receipt');
 });
 
 /*

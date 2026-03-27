@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #fff; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .diagram-container { margin: 40px 0; border: 1px solid #ddd; padding: 20px; background: white; width: 800px; text-align: center; }
+        .label { font-weight: bold; margin-bottom: 10px; color: #333; font-size: 1.2em; }
+    </style>
+</head>
+<body>
+    <div id="pipeline-container" class="diagram-container">
+        <div class="label">Figure 4.8: Project Engineering Pipeline</div>
+        <pre class="mermaid">
+        graph LR
+            Local[Local Development<br/>VS Code, PHP 8.2, Laravel 12, XAMPP] --> DB[Database Design & Migration<br/>PostgreSQL]
+            DB --> Test[Unit Testing]
+            Test --> Git[Version Control<br/>Git/GitHub]
+            Git --> Deployment[Production Deployment]
+            
+            style Local fill:#f9f9f9,stroke:#333,stroke-width:2px
+            style DB fill:#f9f9f9,stroke:#333,stroke-width:2px
+            style Test fill:#f9f9f9,stroke:#333,stroke-width:2px
+            style Git fill:#f9f9f9,stroke:#333,stroke-width:2px
+            style Deployment fill:#f9f9f9,stroke:#333,stroke-width:2px
+        </pre>
+    </div>
+
+    <div id="arch-container" class="diagram-container">
+        <div class="label">Figure 4.4: N-Tier System Architecture</div>
+        <pre class="mermaid">
+        graph TD
+            Client[Client Tier<br/>Web Browser / Tailwind CSS] <--> WebServer[Web Server<br/>Apache]
+            WebServer <--> AppTier[Application Tier<br/>Laravel 12 MVC]
+            AppTier <--> DataTier[Data Tier<br/>PostgreSQL Database]
+            
+            style Client fill:#fff,stroke:#333,stroke-width:2px
+            style WebServer fill:#fff,stroke:#333,stroke-width:2px
+            style AppTier fill:#fff,stroke:#333,stroke-width:2px
+            style DataTier fill:#fff,stroke:#333,stroke-width:2px
+        </pre>
+    </div>
+
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+    </script>
+</body>
+</html>

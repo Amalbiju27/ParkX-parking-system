@@ -5,9 +5,19 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+
+use App\Services\PricingService;
+use Carbon\Carbon;
 
 class BookingController extends Controller
 {
+    protected $pricingService;
+
+    public function __construct(PricingService $pricingService)
+    {
+        $this->pricingService = $pricingService;
+    }
     // Check availability dynamically
     public function checkAvailability(Request $request)
     {
@@ -98,20 +108,18 @@ class BookingController extends Controller
                     throw new \Exception('This slot is already booked during your selected time. Please choose another slot or time.');
                 }
                 
-                // 4. Calculate actual duration and cost
-                $start = \Carbon\Carbon::parse($request->booking_date . ' ' . $request->start_time);
-                $end = \Carbon\Carbon::parse($request->booking_date . ' ' . $request->end_time);
-                
-                $durationMinutes = $start->diffInMinutes($end);
-                $durationHours = ceil($durationMinutes / 60); 
-                if ($durationHours < 1) { $durationHours = 1; }
+                // 4. Calculate actual duration and cost using PricingService
+                $durationHours = $this->pricingService->calculateDurationInHours(
+                    $request->booking_date, 
+                    $request->start_time, 
+                    $request->end_time
+                );
                 
                 $category = \Illuminate\Support\Facades\DB::table('vehicle_categories')->where('id', $request->vehicle_category_id)->first();
-                $ratePerHour = $category ? $category->hourly_rate : 50; 
-                $baseCharge = $category ? $category->base_charge : 40;
+                $ratePerHour = $category ? (float) $category->hourly_rate : (float) 50.0; 
+                $baseCharge = $category ? (float) $category->base_charge : (float) 40.0;
                 
-                $calculatedFee = $durationHours * $ratePerHour;
-                $totalAmount = max($calculatedFee, $baseCharge);
+                $totalAmount = $this->pricingService->calculateFee($durationHours, $ratePerHour, $baseCharge);
                 
                 // 5. Create the Booking entirely using DB table to bypass model classes
                 $bookingId = \Illuminate\Support\Facades\DB::table('bookings')->insertGetId([
@@ -121,6 +129,7 @@ class BookingController extends Controller
                     'vehicle_number' => $request->vehicle_number,
                     'vehicle_category_id' => $request->vehicle_category_id,
                     'vehicle_video' => $videoPath,
+                    'ticket_number' => strtoupper(Str::random(6)),
                     'amount' => $totalAmount,
                     'duration_hours' => $durationHours,
                     'booking_date' => $request->booking_date,
@@ -300,9 +309,9 @@ class BookingController extends Controller
         }
 
         $category = DB::table('vehicle_categories')->where('id', $booking->vehicle_category_id)->first();
-        $ratePerHour = $category ? $category->hourly_rate : 50;
+        $ratePerHour = $category ? (float) $category->hourly_rate : (float) 50.0;
         
-        $extraCost = $hours * $ratePerHour;
+        $extraCost = $this->pricingService->calculateExtensionCost($hours, $ratePerHour);
 
         // Save to session for checkout
         session(['extension_data' => [

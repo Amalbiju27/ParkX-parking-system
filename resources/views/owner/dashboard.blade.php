@@ -43,6 +43,23 @@
                 </h3>
                 <div id="reader" class="rounded-xl overflow-hidden border-[6px] border-black shadow-lg" style="width: 100%; max-width: 500px; display: none;"></div>
                 <div id="scan-result" class="mt-6 w-full max-w-lg text-center"></div>
+
+                <div class="w-full max-w-lg">
+                    <div class="flex items-center my-6">
+                        <div class="flex-grow border-t border-gray-300"></div>
+                        <span class="px-4 text-sm text-gray-400 font-bold uppercase">OR</span>
+                        <div class="flex-grow border-t border-gray-300"></div>
+                    </div>
+
+                    <form action="{{ route('owner.checkin.manual') }}" method="POST" class="flex gap-2">
+                        @csrf
+                        <input type="text" name="ticket_number" placeholder="Enter 6-Digit PIN" 
+                               class="bg-gray-50 border border-gray-300 text-gray-800 text-center font-bold tracking-[0.2em] uppercase rounded-lg p-3 w-full outline-none focus:ring-2 focus:ring-blue-500" 
+                               maxlength="6" required>
+                        <button type="submit" class="bg-[#111] text-white font-bold px-6 py-3 rounded-lg hover:bg-gray-800 transition">VERIFY</button>
+                    </form>
+                </div>
+
                 <button id="stop-scanner" class="btn-secondary mt-6 px-10 py-4 text-sm flex items-center gap-3 font-bold uppercase tracking-widest text-white bg-black hover:bg-red-600 border-none relative overflow-hidden transition-all" style="display: none;">
                     <i class="fas fa-times"></i> CLOSE SCANNER
                 </button>
@@ -561,4 +578,52 @@
         });
     }, 1000);
 </script>
+
+<!-- Payment Collection Modal -->
+@if(session('collect_amount'))
+<div id="payment-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div class="bg-white max-w-md w-full p-10 text-center shadow-2xl border-t-8 border-black animate-scale-up">
+        <div class="mb-6">
+            <div class="w-24 h-24 bg-green-50 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-green-100">
+                <i class="fas fa-hand-holding-dollar text-4xl"></i>
+            </div>
+            <h3 class="text-xs font-bold uppercase tracking-widest text-gray-500 mb-2 font-mono">ENTRY CONFIRMED</h3>
+            <h2 class="text-5xl font-black text-black tracking-tighter uppercase mb-2">COLLECT ₹{{ session('collect_amount') }}</h2>
+            <div class="inline-block px-4 py-1 bg-yellow-400 text-black font-black text-[10px] tracking-widest uppercase text-center">
+                VEHICLE: {{ session('collect_vehicle') }}
+            </div>
+        </div>
+
+        <div class="space-y-3">
+            <a href="{{ route('owner.print.receipt', ['type' => session('collect_type', 'manual'), 'id' => session('collect_id', 0)]) }}" 
+               target="_blank" 
+               class="w-full bg-black text-white py-4 text-sm font-bold tracking-widest uppercase hover:bg-gray-800 transition-all flex items-center justify-center gap-3">
+                <i class="fas fa-print"></i> PRINT RECEIPT
+            </a>
+            <button onclick="document.getElementById('payment-modal').remove()" class="w-full bg-white border-2 border-black text-black py-4 text-sm font-bold tracking-widest uppercase hover:bg-gray-50 transition-all">
+                CLOSE
+            </button>
+        </div>
+        
+        <p class="mt-10 text-[10px] font-bold text-gray-400 uppercase tracking-widest font-mono text-center">PARKX SECURE GATE CONTROL</p>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const audio = new Audio('/sounds/success.wav');
+        audio.play().catch(e => console.warn('Sound blocked by browser policy:', e));
+    });
+</script>
+
+<style>
+    @keyframes scale-up {
+        from { transform: scale(0.95); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+    .animate-scale-up {
+        animation: scale-up 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+</style>
+@endif
 @endsection

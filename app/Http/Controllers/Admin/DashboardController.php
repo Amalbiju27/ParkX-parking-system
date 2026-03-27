@@ -5,8 +5,17 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 
+use App\Services\AnalyticsService;
+
 class DashboardController extends Controller
 {
+    protected $analyticsService;
+
+    public function __construct(AnalyticsService $analyticsService)
+    {
+        $this->analyticsService = $analyticsService;
+    }
+
     public function index()
     {
         /*
@@ -63,47 +72,23 @@ class DashboardController extends Controller
             ->get();
 
         foreach($lots as $lot) {
-            $monthlyRevenue = array_fill(0, 12, 0);
-            $totalRev = 0;
-            $totalBookings = 0;
-
-            // --- A. Process Online User Bookings ---
-            // We use DB::table to avoid class_exists issues if models are differently named
+            // --- A. Process Online User Bookings & B. Manual Gate Entries ---
             $bookings = DB::table('bookings')
                 ->where('parking_space_id', $lot->id)
                 ->whereIn('status', ['completed', 'booked', 'occupied', 'reserved'])
                 ->whereYear('created_at', date('Y'))
                 ->get();
-                
-            foreach($bookings as $b) {
-                // Determine month index (0-11)
-                $monthIndex = (int)\Carbon\Carbon::parse($b->created_at)->format('n') - 1;
-                
-                // Aggressively check multiple possible column names for the money
-                $amount = (float)($b->total_amount ?? $b->amount ?? $b->fee ?? $b->price ?? $b->charge ?? 0);
-                
-                $monthlyRevenue[$monthIndex] += $amount;
-                $totalRev += $amount;
-                $totalBookings++;
-            }
 
-            // --- B. Process Manual Gate Entries ---
             $manuals = DB::table('vehicles')
                 ->where('parking_space_id', $lot->id)
                 ->where('status', 'exited')
                 ->whereYear('created_at', date('Y'))
                 ->get();
-                
-            foreach($manuals as $m) {
-                $monthIndex = (int)\Carbon\Carbon::parse($m->created_at)->format('n') - 1;
-                
-                // Aggressively check multiple possible column names
-                $amount = (float)($m->total_amount ?? $m->amount ?? $m->fee ?? $m->price ?? $m->charge ?? 0);
-                
-                $monthlyRevenue[$monthIndex] += $amount;
-                $totalRev += $amount;
-                $totalBookings++;
-            }
+
+            $monthlyRevenue = $this->analyticsService->aggregateMonthlyRevenue($bookings, $manuals, (int)date('Y'));
+            
+            $totalRev = array_sum($monthlyRevenue);
+            $totalBookings = $bookings->count() + $manuals->count();
 
             // --- 3. Add to Chart Dataset (Configured for a Line Graph) ---
             $chartData['datasets'][] = [
@@ -188,10 +173,8 @@ class DashboardController extends Controller
                 ];
             }
             
-            // --- 2. SORT DATA BY REVENUE (Highest to Lowest) ---
-            usort($processedData, function($a, $b) {
-                return $b['revenue'] <=> $a['revenue'];
-            });
+            // --- 2. SORT DATA BY REVENUE (Highest to Lowest) using AnalyticsService ---
+            $processedData = $this->analyticsService->rankParkingSpaces($processedData);
             
             $reportData = [
                 'lots' => $processedData,

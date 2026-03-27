@@ -36,14 +36,53 @@ return view('owner.vehicle_entry.create', compact('parkingSpaces', 'categories')
      */
   public function getSlots($parkingSpaceId)
     {
+        $space = DB::table('parking_spaces')->where('id', $parkingSpaceId)->first();
+        
+        if (!$space) {
+            return response()->json([]);
+        }
+
+        // 1. Get existing slots
         $slots = DB::table('parking_slots')
             ->where('parking_space_id', $parkingSpaceId)
-            ->select('id', 'slot_number', 'status')
-            // 👇 FIX: Change 'UNSIGNED' to 'INTEGER' for PostgreSQL
-            ->orderByRaw("CAST(SUBSTR(slot_number, 2) AS INTEGER)") 
             ->get();
 
-        return response()->json($slots);
+        // 2. Sync if missing (only if capacity is higher than actual slot records)
+        if ($slots->count() < $space->capacity) {
+            $existingNumbers = $slots->pluck('slot_number')->map(function($n) {
+                return (int) preg_replace('/[^0-9]/', '', $n);
+            })->toArray();
+
+            for ($i = 1; $i <= $space->capacity; $i++) {
+                // Try to find if this index already exists (S1, S2, or just 1, 2)
+                $slotName = 'S' . $i;
+                
+                // Check if any existing slot matches this index (to prevent duplicates if named A1, A2 etc)
+                // But generally we just want to ensure we have 'capacity' items.
+                // If we have 2 slots (A1, A2), and capacity is 10, we'll add S3...S10.
+                if ($slots->count() < $space->capacity && $i > $slots->count()) {
+                    DB::table('parking_slots')->insert([
+                        'parking_space_id' => $parkingSpaceId,
+                        'slot_number'      => 'S' . $i,
+                        'status'           => 'available',
+                        'created_at'       => now(),
+                        'updated_at'       => now(),
+                    ]);
+                }
+            }
+            
+            // Re-fetch everything after sync
+            $slots = DB::table('parking_slots')
+                ->where('parking_space_id', $parkingSpaceId)
+                ->get();
+        }
+
+        // 3. Sort and Return
+        $sortedSlots = $slots->sortBy(function($slot) {
+            return (int) preg_replace('/[^0-9]/', '', $slot->slot_number);
+        })->values();
+
+        return response()->json($sortedSlots);
     }
 
     /**
@@ -76,7 +115,7 @@ return view('owner.vehicle_entry.create', compact('parkingSpaces', 'categories')
             $expectedExitTime = \Carbon\Carbon::parse($request->end_time); 
 
             // Insert Vehicle Record
-            DB::table('vehicles')->insert([
+            $vehicleId = DB::table('vehicles')->insertGetId([
                 'parking_space_id'    => $request->parking_space_id,
                 'slot_id'             => $request->slot_id,
                 'category_id'         => $request->category_id,
@@ -97,7 +136,11 @@ return view('owner.vehicle_entry.create', compact('parkingSpaces', 'categories')
             DB::commit();
 
             return redirect()->route('owner.dashboard')
-                ->with('success', 'Vehicle Parked! Exit expected at ' . $expectedExitTime->format('h:i A'));
+                ->with('success', 'Vehicle Parked! Exit expected at ' . $expectedExitTime->format('h:i A'))
+                ->with('collect_amount', $request->total_amount)
+                ->with('collect_vehicle', strtoupper($request->vehicle_number))
+                ->with('collect_id', $vehicleId)
+                ->with('collect_type', 'manual');
 
         } catch (\Exception $e) {
             DB::rollback();

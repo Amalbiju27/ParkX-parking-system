@@ -22,9 +22,14 @@
                 <p class="text-gray-500 text-xs font-bold uppercase tracking-widest mt-1">{{ $booking->location ?? 'DOWNTOWN DISTRICT' }}</p>
             </div>
             
-            <div class="flex justify-center mb-8 p-4 bg-gray-50 border border-t-0 border-x-0 border-b-2 border-black border-dashed pb-8">
+            <div class="flex justify-center mb-4 p-4 bg-gray-50 border border-t-0 border-x-0 border-b-2 border-black border-dashed pb-8">
                 <!-- simple-qrcode blade syntax -->
                 {!! QrCode::size(220)->color(0, 0, 0)->margin(0)->generate(route('ticket.show', $booking->id)) !!}
+            </div>
+
+            <div class="bg-gray-100 border border-gray-300 rounded-lg p-3 text-center mt-4 mb-8">
+                <span class="text-xs text-gray-500 font-bold tracking-widest uppercase block mb-1">TICKET PIN</span>
+                <span class="text-3xl font-extrabold tracking-[0.2em] text-gray-800">{{ $booking->ticket_number ?? '--- ---' }}</span>
             </div>
 
             <div class="bg-gray-50 p-6 border border-gray-200 mb-8">

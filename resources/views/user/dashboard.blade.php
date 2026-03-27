@@ -128,7 +128,7 @@
                                 <tr class="hover:bg-gray-50 transition-colors">
                                     <td class="py-6 px-6">
                                         <div class="font-bold text-black text-lg tracking-widest uppercase">{{ $b->space_name }}</div>
-                                        <div class="text-gray-500 text-xs font-bold uppercase tracking-widest mt-1">{{ $b->vehicle_category_name ?? 'VEHICLE' }} • {{ $b->duration_hours }} HR(S)</div>
+                                        <div class="text-gray-500 text-xs font-bold uppercase tracking-widest mt-1">{{ $b->vehicle_category_name ?? 'VEHICLE' }} • {{ $b->vehicle_number }} • {{ $b->duration_hours }} HR(S)</div>
                                     </td>
                                     <td class="py-6 px-6">
                                         <span class="inline-block px-3 py-1 rounded-full text-xs font-bold border tracking-widest {{ $b->status == 'cancelled' ? 'border-red-200 text-red-700 bg-red-50' : 'border-green-200 text-green-700 bg-green-50' }} mb-2 uppercase">
@@ -218,7 +218,10 @@
                         <tbody class="divide-y divide-gray-200">
                             @foreach($pastBookings as $b)
                                 <tr class="hover:bg-gray-50 transition-colors">
-                                    <td class="py-4 px-6 font-bold text-black uppercase text-lg">{{ $b->space_name }}</td>
+                                    <td class="py-4 px-6">
+                                        <div class="font-bold text-black uppercase text-lg">{{ $b->space_name }}</div>
+                                        <div class="text-gray-400 text-xs font-bold uppercase tracking-widest">{{ $b->vehicle_number }}</div>
+                                    </td>
                                     <td class="py-4 px-6 text-gray-500 text-xs font-bold uppercase tracking-widest">{{ \Carbon\Carbon::parse($b->created_at)->format('M d, Y H:i') }}</td>
                                     <td class="py-4 px-6 text-center text-black font-mono font-bold tracking-widest">{{ $b->duration_hours }} HR(S)</td>
                                     <td class="py-4 px-6 font-mono font-black text-black text-lg">₹{{ number_format($b->amount, 0) }}</td>

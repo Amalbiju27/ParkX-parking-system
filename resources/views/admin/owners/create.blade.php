@@ -3,152 +3,107 @@
 @section('title', 'Add Owner')
 
 @section('content')
-    <style>
-        .glass-panel {
-            background: rgba(15, 15, 20, 0.9);
-            backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #00f2ff 0%, #0099cc 100%);
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #00f2ff 0%, #00d4e6 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 12px 25px rgba(0, 242, 255, 0.3);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: #00f2ff;
-            box-shadow: 0 8px 20px rgba(0, 242, 255, 0.2);
-        }
-
-        input, textarea, select {
-            background: rgba(20, 20, 25, 0.9) !important;
-            border: 2px solid rgba(255, 255, 255, 0.15) !important;
-            backdrop-filter: blur(10px) !important;
-            color: white !important;
-        }
-
-        input:focus, textarea:focus, select:focus {
-            border-color: #00f2ff !important;
-            box-shadow: 0 0 0 3px rgba(0, 242, 255, 0.2) !important;
-            outline: none !important;
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-    </style>
-
-    <div class="relative z-20 max-w-lg mx-auto px-4 py-16">
+<div class="w-full min-h-screen py-5" style="background-image: url('{{ asset('images/dashboard-bg.jpg') }}'); background-size: cover; background-position: center; background-attachment: fixed;">
+    <div class="container p-4 p-md-5 mx-auto max-w-3xl shadow-lg" style="background-color: rgba(255, 255, 255, 0.92); backdrop-filter: blur(15px); border: 1px solid rgba(0,0,0,0.1); border-radius: 0;">
         
         <!-- Header -->
-        <div class="glass-panel rounded-2xl p-6 lg:p-8 mb-8 animate-slide-up">
-            <div class="flex items-center gap-4">
-                <div class="w-14 h-14 bg-gradient-to-br from-accent-glow to-accent-dark rounded-xl flex items-center justify-center shadow-xl animate-pulse-glow">
-                    <i class="fas fa-user-plus text-lg text-black"></i>
+        <div class="card-minimal border border-dark rounded-0 p-8 lg:p-12 mb-8 animate-slide-up bg-white">
+            <div class="flex items-center gap-6">
+                <div class="w-16 h-16 bg-black flex items-center justify-center overflow-hidden p-3 border-2 border-black">
+                    <i class="fas fa-user-tie text-white text-3xl"></i>
                 </div>
                 <div>
-                    <h1 class="font-tech text-3xl lg:text-4xl font-bold text-white tracking-tight">ADD OWNER</h1>
-                    <p class="text-sm text-slate-400 mt-1">Create new parking space owner account</p>
+                    <h1 class="text-4xl font-black text-black tracking-tighter uppercase mb-1 font-display">ADD OWNER</h1>
+                    <p class="text-sm text-gray-500 font-bold uppercase tracking-widest">ONBOARD A NEW PARKING SPACE ADMINISTRATOR</p>
                 </div>
             </div>
         </div>
 
-        <!-- Main Form -->
-        <div class="glass-panel rounded-2xl p-8 animate-slide-up" style="animation-delay: 0.1s;">
-            
-            <!-- Form -->
-            <form method="POST" action="/admin/owners" class="space-y-6">
+        @if(session('success'))
+            <div class="mb-8 p-6 bg-green-50 border-2 border-green-600 flex items-center gap-4 animate-slide-up">
+                <i class="fas fa-check-circle text-green-600 text-2xl"></i>
+                <span class="text-green-800 font-bold uppercase tracking-wider text-sm">{{ session('success') }}</span>
+            </div>
+        @endif
+        
+        @if(session('error'))
+            <div class="mb-8 p-6 bg-red-50 border-2 border-red-600 flex items-center gap-4 animate-slide-up">
+                <i class="fas fa-exclamation-circle text-red-600 text-2xl"></i>
+                <span class="text-red-800 font-bold uppercase tracking-wider text-sm">{{ session('error') }}</span>
+            </div>
+        @endif
+
+        <!-- Form Container -->
+        <div class="card-minimal border border-dark rounded-0 p-8 lg:p-12 animate-slide-up bg-white" style="animation-delay: 0.1s;">
+            <form method="POST" action="/admin/owners" class="space-y-8">
                 @csrf
                 
-                <!-- Owner Name -->
-                <div class="space-y-2">
-                    <label class="block text-sm font-semibold text-white font-tech uppercase tracking-wider flex items-center gap-2 text-accent-glow">
-                        <i class="fas fa-user"></i> Full Name
-                    </label>
-                    <input type="text" 
-                           name="name" 
-                           placeholder="John Doe"
-                           value="{{ old('name') }}"
-                           required
-                           class="w-full h-12 px-4 rounded-xl text-lg font-medium placeholder-slate-500 focus:ring-2 focus:ring-accent-glow/30 transition-all">
-                </div>
+                <div class="grid grid-cols-1 gap-8 shadow-none">
+                    
+                    <!-- Owner Name -->
+                    <div class="space-y-3">
+                        <label class="block text-sm font-black text-black uppercase tracking-widest flex items-center gap-2">
+                            <i class="fas fa-user text-black"></i> FULL NAME
+                        </label>
+                        <input type="text" name="name" placeholder="ENTER OWNER's FULL NAME" value="{{ old('name') }}" required
+                               class="w-full h-14 px-5 rounded-0 text-black bg-white border-2 border-black focus:border-black focus:ring-0 transition-all outline-none font-bold uppercase placeholder-gray-400">
+                    </div>
 
-                <!-- Email -->
-                <div class="space-y-2">
-                    <label class="block text-sm font-semibold text-white font-tech uppercase tracking-wider flex items-center gap-2 text-accent-glow">
-                        <i class="fas fa-envelope"></i> Email Address
-                    </label>
-                    <input type="email" 
-                           name="email" 
-                           placeholder="john.doe@example.com"
-                           value="{{ old('email') }}"
-                           required
-                           class="w-full h-12 px-4 rounded-xl text-lg font-medium placeholder-slate-500 focus:ring-2 focus:ring-accent-glow/30 transition-all">
-                </div>
+                    <!-- Email -->
+                    <div class="space-y-3">
+                        <label class="block text-sm font-black text-black uppercase tracking-widest flex items-center gap-2">
+                            <i class="fas fa-envelope text-black"></i> EMAIL IDENTITY
+                        </label>
+                        <input type="email" name="email" placeholder="OWNER@PARKX.COM" value="{{ old('email') }}" required
+                               class="w-full h-14 px-5 rounded-0 text-black bg-white border-2 border-black focus:border-black focus:ring-0 transition-all outline-none font-bold uppercase placeholder-gray-400">
+                    </div>
 
-                <!-- Password -->
-                <div class="space-y-2">
-                    <label class="block text-sm font-semibold text-white font-tech uppercase tracking-wider flex items-center gap-2 text-accent-glow">
-                        <i class="fas fa-lock"></i> Password
-                    </label>
-                    <input type="password" 
-                           name="password" 
-                           placeholder="••••••••"
-                           required
-                           class="w-full h-12 px-4 rounded-xl text-lg font-medium placeholder-slate-500 focus:ring-2 focus:ring-accent-glow/30 transition-all">
-                </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Password -->
+                        <div class="space-y-3">
+                            <label class="block text-sm font-black text-black uppercase tracking-widest flex items-center gap-2">
+                                <i class="fas fa-lock text-black"></i> SECURE PASSWORD
+                            </label>
+                            <input type="password" name="password" placeholder="••••••••" required
+                                   class="w-full h-14 px-5 rounded-0 text-black bg-white border-2 border-black focus:border-black focus:ring-0 transition-all outline-none font-bold placeholder-gray-400 font-mono">
+                        </div>
 
-                <!-- Contact -->
-                <div class="space-y-2">
-                    <label class="block text-sm font-semibold text-white font-tech uppercase tracking-wider flex items-center gap-2 text-accent-glow">
-                        <i class="fas fa-phone"></i> Contact Number
-                    </label>
-                    <input type="text" 
-                           name="contact" 
-                           placeholder="+91 98765 43210"
-                           value="{{ old('contact') }}"
-                           class="w-full h-12 px-4 rounded-xl text-lg font-medium placeholder-slate-500 focus:ring-2 focus:ring-accent-glow/30 transition-all">
-                </div>
+                        <!-- Contact -->
+                        <div class="space-y-3">
+                            <label class="block text-sm font-black text-black uppercase tracking-widest flex items-center gap-2">
+                                <i class="fas fa-phone text-black"></i> CONTACT NUMBER
+                            </label>
+                            <input type="text" name="contact" placeholder="+91 00000 00000" value="{{ old('contact') }}" required
+                                   class="w-full h-14 px-5 rounded-0 text-black bg-white border-2 border-black focus:border-black focus:ring-0 transition-all outline-none font-bold uppercase placeholder-gray-400 font-mono">
+                        </div>
+                    </div>
 
-                <!-- Address -->
-                <div class="space-y-2">
-                    <label class="block text-sm font-semibold text-white font-tech uppercase tracking-wider flex items-center gap-2 text-accent-glow">
-                        <i class="fas fa-map-marker-alt"></i> Address
-                    </label>
-                    <textarea name="address" 
-                              placeholder="Enter complete address..."
-                              class="w-full px-4 py-4 rounded-xl text-lg font-medium placeholder-slate-500 focus:ring-2 focus:ring-accent-glow/30 transition-all">{{ old('address') }}</textarea>
+                    <!-- Address -->
+                    <div class="space-y-3">
+                        <label class="block text-sm font-black text-black uppercase tracking-widest flex items-center gap-2">
+                            <i class="fas fa-map-marker-alt text-black"></i> PHYSICAL ADDRESS
+                        </label>
+                        <textarea name="address" placeholder="RESIDENTIAL OR BUSINESS ADDRESS..." required
+                                  class="w-full h-32 px-5 py-4 rounded-0 text-black bg-white border-2 border-black focus:border-black focus:ring-0 transition-all outline-none resize-none font-bold uppercase placeholder-gray-400"></textarea>
+                    </div>
                 </div>
 
                 <!-- Action Buttons -->
-                <div class="flex flex-col sm:flex-row gap-4 pt-2">
+                <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t-2 border-gray-200 mt-8">
                     <button type="submit" 
-                            class="btn-primary flex-1 h-14 px-6 text-black font-tech font-bold text-lg rounded-2xl flex items-center justify-center gap-2 uppercase tracking-wide shadow-xl hover:shadow-2xl transition-all">
-                        <i class="fas fa-user-plus"></i>
-                        Create Owner
+                            class="flex-[2] h-16 bg-black text-white font-bold text-lg rounded-0 flex items-center justify-center gap-3 uppercase tracking-widest hover:bg-gray-800 transition-colors border-2 border-black">
+                        <i class="fas fa-plus-circle text-xl"></i>
+                        CONFIRM REGISTRATION
                     </button>
                     
                     <a href="{{ url('/admin') }}" 
-                       class="btn-secondary flex-1 h-14 px-6 text-white font-tech font-bold text-lg rounded-2xl flex items-center justify-center gap-2 shadow-xl">
-                        <i class="fas fa-arrow-left"></i>
-                        Back to Dashboard
+                       class="flex-1 h-16 bg-white text-black font-bold text-lg rounded-0 flex items-center justify-center gap-2 uppercase tracking-widest hover:bg-gray-100 transition-colors border-2 border-black">
+                        <i class="fas fa-times"></i>
+                        CANCEL
                     </a>
                 </div>
             </form>
         </div>
+    </div>
+</div>
 @endsection
