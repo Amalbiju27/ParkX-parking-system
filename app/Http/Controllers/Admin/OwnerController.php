@@ -11,6 +11,22 @@ class OwnerController extends Controller
 {
     /*
     |--------------------------------------------------------------------------
+    | List Owners
+    |--------------------------------------------------------------------------
+    */
+    public function index()
+    {
+        $owners = DB::table('users')
+            ->leftJoin('parking_space_owners', 'users.id', '=', 'parking_space_owners.user_id')
+            ->where('users.role', 'owner')
+            ->select('users.*', 'parking_space_owners.contact', 'parking_space_owners.address')
+            ->get();
+
+        return view('admin.owners.index', compact('owners'));
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Create Owner
     |--------------------------------------------------------------------------
     */

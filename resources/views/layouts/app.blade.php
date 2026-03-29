@@ -203,6 +203,7 @@
                     <a href="/admin" class="nav-link">Dashboard</a>
                     <a href="/admin/parking-spaces" class="nav-link">Spaces</a>
                     <a href="/admin/vehicle-categories" class="nav-link">Categories</a>
+                    <a href="/admin/owners" class="nav-link">Owners</a>
                 @elseif(auth()->user()->role == 'owner')
                     <a href="/owner" class="nav-link">Dashboard</a>
                     <a href="/owner/vehicle-entry" class="nav-link">Entry</a>

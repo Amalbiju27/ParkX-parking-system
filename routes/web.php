@@ -65,6 +65,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/vehicle-categories/{id}/update', [VehicleCategoryController::class, 'update']);
 
     // Owners
+    Route::get('/owners', [OwnerController::class, 'index'])->name('owners.index');
     Route::get('/owners/create', [OwnerController::class, 'create']);
     Route::post('/owners', [OwnerController::class, 'store']);
     Route::get('/owners/{id}/edit', [OwnerController::class, 'edit']);
