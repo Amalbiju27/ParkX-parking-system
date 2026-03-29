@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParkX - Project Functionalities Report</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #475569;
+            --accent: #3b82f6;
+            --background: #f8fafc;
+            --text: #1e293b;
+            --header: #0f172a;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px;
+            background-color: var(--background);
+        }
+
+        .container {
+            background: white;
+            padding: 50px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        header {
+            border-bottom: 2px solid var(--primary);
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+        }
+
+        h1 {
+            color: var(--header);
+            font-size: 2.5em;
+            margin: 0;
+            letter-spacing: -0.025em;
+        }
+
+        h2 {
+            color: var(--primary);
+            font-size: 1.8em;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 0.3em;
+            margin-top: 1.5em;
+        }
+
+        h3 {
+            color: var(--header);
+            font-size: 1.3em;
+            margin-top: 1.2em;
+        }
+
+        p {
+            margin-bottom: 1em;
+        }
+
+        ul {
+            margin-bottom: 1.5em;
+            padding-left: 1.5em;
+        }
+
+        li {
+            margin-bottom: 0.5em;
+        }
+
+        code {
+            background-color: #f1f5f9;
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-family: 'Cascadia Code', 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+            color: #ef4444;
+        }
+
+        hr {
+            border: 0;
+            border-top: 1px solid #e2e8f0;
+            margin: 2em 0;
+        }
+
+        .highlight {
+            background-color: #eff6ff;
+            border-left: 4px solid var(--primary);
+            padding: 1.5em;
+            margin: 1.5em 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .table-section {
+            background-color: #fafafa;
+            border: 1px solid #eee;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        @media print {
+            body { 
+                background-color: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                padding: 0;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ParkX - Project Functionalities Report</h1>
+            <p><strong>Commercial Vehicle Parking Management System</strong></p>
+        </header>
+
+        <section>
+            <h2>Project Overview</h2>
+            <p>ParkX is a comprehensive parking management solution designed to streamline parking operations, facilitate advance bookings, and monitor parking spaces dynamically. It supports three distinct participant roles: <strong>Admin</strong>, <strong>Owner</strong>, and <strong>User</strong>, each with dedicated modules and access rights.</p>
+        </section>
+
+        <section>
+            <h2>Core Roles & Capabilities</h2>
+
+            <h3>1. User (Customer) Module</h3>
+            <p>The User module focuses on providing a seamless booking and parking experience.</p>
+            <ul>
+                <li><strong>Advance Booking System</strong>: Users can book a parking slot for a specific date and time interval (<code>start_time</code> to <code>end_time</code>), specifying their vehicle category and duration.</li>
+                <li><strong>QR Code Ticketing</strong>: Upon successful booking, a unique <code>ticket_number</code> is generated. This acts as a digital pass, verifiable via QR scan at the parking facility.</li>
+                <li><strong>Vehicle Video Verification</strong>: Enhances security by allowing users to upload a video of their vehicle during the booking process.</li>
+                <li><strong>Booking Dashboard</strong>: Allows users to track upcoming and active bookings, and download entry proofs and payment receipts.</li>
+            </ul>
+
+            <h3>2. Space Owner Module</h3>
+            <p>The Owner module provides tools for managing day-to-day operations at a specific parking site.</p>
+            <ul>
+                <li><strong>Operational Dashboard</strong>: Visualizes live metrics including available slots, current active parked vehicles, expected arrivals, and revenue generated.</li>
+                <li><strong>Vehicle Entry (QR Validation)</strong>: Owners scan the user's QR ticket. The system employs time-based validation to strictly prevent early check-ins (e.g., >15 mins before start time) and rejects expired tickets.</li>
+                <li><strong>Vehicle Exit & Billing</strong>: Manages the check-out process. It calculates total parked time, automatically detects overstays (<code>extended_minutes</code>), applies corresponding penalty charges (<code>fine_amount</code>), and finalizes the user's session.</li>
+            </ul>
+
+            <h3>3. System Admin Module</h3>
+            <p>The Admin module handles platform-wide configurations and oversight.</p>
+            <ul>
+                <li><strong>Global Dashboard</strong>: Monitors total active parking spaces, overall registered owners, and platform-wide revenue streams.</li>
+                <li><strong>Owner Management</strong>: Approves, registers, and deactivates parking space owners.</li>
+                <li><strong>Parking Space Allocation</strong>: Creates new parking domains, defines total capacity, and allocates slots.</li>
+                <li><strong>Dynamic Pricing Configuration</strong>: Manages <code>vehicle_categories</code>, defining the <code>base_charge</code> and <code>hourly_rate</code> dynamically based on vehicle type (Bike, Car, Truck, etc.).</li>
+                <li><strong>Financial Exports</strong>: Generates and exports comprehensive financial reports.</li>
+            </ul>
+
+            <h3>4. Automated Operations (Cron Jobs)</h3>
+            <div class="highlight">
+                <p><strong>Expired Booking Cancellation</strong>: Automatically frees up reserved slots if a booking remains unpaid or unoccupied 15 minutes after its creation.</p>
+                <p><strong>No-Show Handling</strong>: Automatically flags and penalizes bookings where the user fails to arrive.</p>
+            </div>
+        </section>
+
+        <hr>
+
+        <section>
+            <h2>Database Architecture (Schema)</h2>
+
+            <div class="table-section">
+                <h3>1. <code>users</code> Table</h3>
+                <p>Stores authentication and role-based access for all actors.</p>
+                <ul>
+                    <li><strong>Fields</strong>: id, name, email, password, role (admin, owner, user), status, last_login, timestamps.</li>
+                </ul>
+            </div>
+
+            <div class="table-section">
+                <h3>2. <code>parking_spaces</code> Table</h3>
+                <p>Details physical parking locations.</p>
+                <ul>
+                    <li><strong>Fields</strong>: id, name, location, capacity, available_slots, status, owner_id.</li>
+                </ul>
+            </div>
+
+            <div class="table-section">
+                <h3>3. <code>vehicle_categories</code> Table</h3>
+                <p>Manages the pricing models applied to different types of transport.</p>
+                <ul>
+                    <li><strong>Fields</strong>: id, name, base_charge, hourly_rate.</li>
+                </ul>
+            </div>
+
+            <div class="table-section">
+                <h3>4. <code>parking_slots</code> Table</h3>
+                <p>Tracks individual spots inside a larger parking space, ensuring physical mapping.</p>
+                <ul>
+                    <li><strong>Fields</strong>: id, parking_space_id, slot_number, slot_type, status.</li>
+                </ul>
+            </div>
+
+            <div class="table-section">
+                <h3>5. <code>bookings</code> Table</h3>
+                <p>The central transactional table for advance reservations and state changes.</p>
+                <ul>
+                    <li><strong>Fields</strong>: id, ticket_number, user_id, parking_space_id, slot_id, status, expires_at, vehicle_category_id, amount, payment_status, booking_date, start_time, end_time, vehicle_video, scanned_at, fine_amount.</li>
+                </ul>
+            </div>
+        </section>
+
+        <hr>
+
+        <section>
+            <h2>Technical Stack & Logic</h2>
+            <ul>
+                <li><strong>Framework</strong>: Laravel 11.x (PHP)</li>
+                <li><strong>Database</strong>: MySQL/MariaDB (via Eloquent ORM)</li>
+                <li><strong>Analytics</strong>: Handled via <code>AnalyticsService.php</code></li>
+                <li><strong>Pricing Service</strong>: Logic in <code>PricingService.php</code> for rate calculations and overstay fines.</li>
+            </ul>
+        </section>
+        
+        <footer class="no-print" style="margin-top: 50px; text-align: center; color: var(--secondary);">
+            <p><em>To save as PDF: Open this file in Chrome, press Ctrl+P (Cmd+P) and select "Save as PDF"</em></p>
+        </footer>
+    </div>
+</body>
+</html>
