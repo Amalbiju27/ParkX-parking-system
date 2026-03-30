@@ -237,7 +237,7 @@
             
             @if($videoPath)
                 <div class="mt-2 text-center" style="margin-bottom: 8px;">
-                    <a href="{{ \Illuminate\Support\Facades\Storage::url($videoPath) }}" 
+                    <a href="{{ \Illuminate\Support\Facades\Storage::disk('s3')->url($videoPath) }}" 
                        target="_blank" 
                        class="btn btn-sm btn-outline-light w-100" 
                        style="font-size: 0.65rem; border: 1px solid rgba(255,255,255,0.3); color: white; display: inline-block; padding: 6px; letter-spacing: 1px;">

@@ -86,7 +86,7 @@ class BookingController extends Controller
                 // Handle Video Upload
                 $videoPath = null;
                 if ($request->hasFile('vehicle_video')) {
-                    $videoPath = $request->file('vehicle_video')->store('vehicle_videos');
+                    $videoPath = $request->file('vehicle_video')->store('vehicle_videos', 's3');
                 }
                 
                 // 3. Conflict Checking (Prevent Double Booking)
