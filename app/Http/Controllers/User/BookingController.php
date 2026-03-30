@@ -76,18 +76,14 @@ class BookingController extends Controller
             'booking_date' => 'required|date|after_or_equal:today|before_or_equal:+1 day',
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
-            'vehicle_video' => 'nullable|file|mimetypes:video/mp4,video/quicktime,video/x-msvideo|max:10240',
+
         ]);
     
         try {
             // 2. Wrap in a database transaction for safety
             return \Illuminate\Support\Facades\DB::transaction(function () use ($request) {
                 
-                // Handle Video Upload
-                $videoPath = null;
-                if ($request->hasFile('vehicle_video')) {
-                    $videoPath = $request->file('vehicle_video')->store('vehicle_videos', 's3');
-                }
+
                 
                 // 3. Conflict Checking (Prevent Double Booking)
                 $conflict = \Illuminate\Support\Facades\DB::table('bookings')
@@ -128,7 +124,7 @@ class BookingController extends Controller
                     'slot_id' => $request->slot_id,
                     'vehicle_number' => $request->vehicle_number,
                     'vehicle_category_id' => $request->vehicle_category_id,
-                    'vehicle_video' => $videoPath,
+
                     'ticket_number' => strtoupper(Str::random(6)),
                     'amount' => $totalAmount,
                     'duration_hours' => $durationHours,

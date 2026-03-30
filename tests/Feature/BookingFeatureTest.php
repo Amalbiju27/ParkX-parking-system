@@ -142,4 +142,5 @@ class BookingFeatureTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('HIST-999');
     }
+
 }

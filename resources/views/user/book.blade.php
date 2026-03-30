@@ -119,11 +119,7 @@ if (!function_exists('renderSlot')) {
                         @endforeach
                     </select>
                 </div>
-                <div class="form-group">
-                    <label class="custom-label">VEHICLE VIDEO (OPTIONAL)</label>
-                    <input type="file" name="vehicle_video" class="custom-input" accept="video/mp4,video/x-m4v,video/*" style="padding: 10px;">
-                    <small style="color: #6b7280; font-size: 0.7rem; font-weight: bold;">Max size: 20MB. Helps verify vehicle condition.</small>
-                </div>
+
                 <div class="form-group">
                     <label class="custom-label">BOOKING DATE</label>
                     <select name="booking_date" class="custom-input" required>

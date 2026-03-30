@@ -147,4 +147,5 @@ class OwnerFeatureTest extends TestCase
         $response = $this->get('/owner');
         $response->assertStatus(302);
     }
+
 }
