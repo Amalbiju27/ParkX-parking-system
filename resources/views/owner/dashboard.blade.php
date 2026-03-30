@@ -51,7 +51,7 @@
                         <div class="flex-grow border-t border-gray-300"></div>
                     </div>
 
-                    <form action="{{ route('owner.checkin.manual') }}" method="POST" class="flex gap-2">
+                    <form id="manual-pin-form" action="{{ route('owner.checkin.manual') }}" method="POST" class="flex gap-2">
                         @csrf
                         <input type="text" name="ticket_number" placeholder="Enter 6-Digit PIN" 
                                class="bg-gray-50 border border-gray-300 text-gray-800 text-center font-bold tracking-[0.2em] uppercase rounded-lg p-3 w-full outline-none focus:ring-2 focus:ring-blue-500" 
@@ -539,6 +539,61 @@
 
         function onScanFailure(error) {
             // keep scanning silently
+        }
+
+        // --- MANUAL PIN AJAX HANDLER ---
+        const manualPinForm = document.getElementById('manual-pin-form');
+        if (manualPinForm) {
+            manualPinForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                const pin = formData.get('ticket_number');
+                
+                if (!pin || pin.length !== 6) return;
+                
+                // Show loading state in the scanner's result area
+                scannerContainer.style.display = 'block';
+                scanResult.innerHTML = '<div class="p-6 bg-blue-50 text-blue-700 font-bold border-2 border-blue-300 rounded text-xl uppercase tracking-widest"><i class="fas fa-circle-notch fa-spin mr-3"></i> Validating PIN...</div>';
+                
+                fetch(this.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest', // Force expectsJson() in Laravel
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Play a scanner bip
+                        let audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+                        audio.play().catch(e => console.log('Audio error:', e));
+
+                        let alertClass = data.payment_status === 'paid' ? 'bg-green-50 text-green-800 border-green-400' : 'bg-orange-50 text-orange-800 border-orange-400';
+                        let paymentMsg = data.payment_status === 'paid' ? '<i class="fas fa-check-double text-green-500 mr-2"></i> ONLINE PAYMENT CLEARED' : '<i class="fas fa-hand-holding-dollar text-orange-500 mr-2"></i> UNPAID TICKET - COLLECT PAYMENT NOW';
+
+                        scanResult.innerHTML = `
+                        <div class="p-8 ${alertClass} font-bold border-2 rounded">
+                            <i class="fas fa-check-circle text-5xl mb-4 block"></i>
+                            <div class="text-3xl tracking-tighter uppercase font-black mb-3 text-black">${data.message}</div>
+                            <div class="text-lg uppercase tracking-widest flex items-center justify-center">${paymentMsg}</div>
+                        </div>`;
+                        
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 4000);
+                    } else {
+                        scanResult.innerHTML = `<div class="p-6 bg-red-50 text-red-800 font-bold border-2 border-red-400 rounded text-xl"><i class="fas fa-times-circle text-2xl mr-2 text-red-600"></i> ${data.message}</div>`;
+                    }
+                })
+                .catch(error => {
+                    console.error(error);
+                    scanResult.innerHTML = `<div class="p-6 bg-red-50 text-red-800 font-bold border-2 border-red-400 rounded text-xl uppercase tracking-widest"><i class="fas fa-wifi text-2xl mr-2"></i> Connection Error.</div>`;
+                });
+            });
         }
     });
 

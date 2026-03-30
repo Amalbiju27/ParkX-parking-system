@@ -342,23 +342,40 @@ class DashboardController extends Controller
             ->first();
 
         if (!$booking) {
+            if ($request->expectsJson()) {
+                return response()->json(['status' => 'error', 'message' => 'Invalid Ticket PIN.']);
+            }
             return back()->with('error', 'Invalid Ticket PIN.');
         }
 
         if (in_array($booking->status, ['cancelled', 'completed'])) {
+            if ($request->expectsJson()) {
+                return response()->json(['status' => 'error', 'message' => 'Booking is already ' . $booking->status . '.']);
+            }
             return back()->with('error', 'Booking is already ' . $booking->status . '.');
         }
 
         if (now()->lessThan(Carbon::parse($booking->start_time)->subMinutes(15))) {
-            return back()->with('error', 'Too early! This ticket is valid from ' . Carbon::parse($booking->start_time)->format('h:i A on d M Y'));
+            $msg = 'Too early! This ticket is valid from ' . Carbon::parse($booking->start_time)->format('h:i A on d M Y');
+            if ($request->expectsJson()) {
+                return response()->json(['status' => 'error', 'message' => $msg]);
+            }
+            return back()->with('error', $msg);
         }
 
         if (now()->greaterThan(Carbon::parse($booking->end_time))) {
+            if ($request->expectsJson()) {
+                return response()->json(['status' => 'error', 'message' => 'This ticket has already expired.']);
+            }
             return back()->with('error', 'This ticket has already expired.');
         }
 
         if ($booking->scanned_at !== null) {
-            return back()->with('error', 'Already scanned at ' . Carbon::parse($booking->scanned_at)->format('h:i A'));
+            $msg = 'Already scanned at ' . Carbon::parse($booking->scanned_at)->format('h:i A');
+            if ($request->expectsJson()) {
+                return response()->json(['status' => 'error', 'message' => $msg, 'payment_status' => $booking->payment_status]);
+            }
+            return back()->with('error', $msg);
         }
 
         DB::table('bookings')->where('id', $booking->id)->update([
@@ -366,6 +383,14 @@ class DashboardController extends Controller
             'status' => 'occupied',
             'updated_at' => now(),
         ]);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'status' => 'success', 
+                'message' => 'Vehicle successfully checked in!',
+                'payment_status' => $booking->payment_status
+            ]);
+        }
 
         return back()->with('success', 'Vehicle manually checked in successfully!');
     }
